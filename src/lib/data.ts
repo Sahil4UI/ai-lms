@@ -4,6 +4,9 @@ export type Lecture = {
   id: string;
   title: string;
   duration: string;
+  videoUrl: string;
+  videoFileName: string;
+  notes?: string;
 };
 
 export type Course = {
@@ -19,6 +22,6 @@ export type Course = {
   rating: number; // This would be calculated dynamically later
   students: number; // This would be incremented
   whatYoullLearn: string[];
-  lectures: Lecture[]; // This will later become a subcollection
+  lectures: Lecture[];
   createdAt: Timestamp;
 };

@@ -8,6 +8,7 @@ import {
   PlayCircle,
   Star,
   Lock,
+  FileText,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,11 +18,11 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import LectureSummary from './lecture-summary';
 import AiAssistant from './ai-assistant';
 import { cn } from '@/lib/utils';
 import { doc, getDoc } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
+import ReactMarkdown from 'react-markdown';
 
 // Revalidate this page every 60 seconds
 export const revalidate = 60;
@@ -60,7 +61,7 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
               </span>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4" />
-                <span>8 hours on-demand video</span>
+                <span>{course.lectures.length} lectures</span>
               </div>
               <div className="flex items-center gap-2">
                 <BarChart className="w-4 h-4" />
@@ -110,22 +111,37 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
                     <AccordionItem value={`item-${index}`} key={lecture.id} disabled={isLocked}>
                       <AccordionTrigger
                         disabled={isLocked}
-                        className={cn(isLocked && 'cursor-not-allowed text-muted-foreground hover:no-underline')}
+                        className={cn('hover:no-underline', isLocked && 'cursor-not-allowed text-muted-foreground')}
                       >
-                        <div className="flex items-center gap-3">
-                          {isLocked ? <Lock className="w-5 h-5" /> : <PlayCircle className="w-5 h-5" />}
-                          <span className="font-medium text-left">{lecture.title}</span>
+                        <div className="flex items-center gap-3 flex-1 text-left">
+                          {isLocked ? <Lock className="w-5 h-5 shrink-0" /> : <PlayCircle className="w-5 h-5 shrink-0" />}
+                          <div className="flex flex-col">
+                            <span className="font-medium">{lecture.title}</span>
+                             <span className="text-xs text-muted-foreground">{lecture.duration}</span>
+                          </div>
                         </div>
                          {isLocked && <Badge variant="secondary" className="ml-auto mr-4">Locked</Badge>}
                       </AccordionTrigger>
-                      <AccordionContent className="pl-11 pr-2">
+                      <AccordionContent className="pl-4 pr-2">
                         {!isLocked ? (
-                          <div className="flex justify-between items-center">
-                            <p className="text-muted-foreground">Duration: {lecture.duration}</p>
-                            <LectureSummary lecture={lecture} />
+                          <div className="space-y-4">
+                            <video
+                              key={lecture.videoUrl}
+                              src={lecture.videoUrl}
+                              controls
+                              className="w-full rounded-lg border bg-black"
+                            >
+                              Your browser does not support the video tag.
+                            </video>
+                             {lecture.notes && (
+                                <div className="prose prose-sm dark:prose-invert max-w-none border-t pt-4">
+                                  <h3 className="flex items-center gap-2 text-base font-semibold"><FileText className="w-4 h-4" />Lecture Notes</h3>
+                                  <ReactMarkdown>{lecture.notes}</ReactMarkdown>
+                                </div>
+                              )}
                           </div>
                         ) : (
-                          <p className="text-muted-foreground">
+                          <p className="text-muted-foreground pl-9">
                             Enroll in the course to unlock this lecture and get lifetime access.
                           </p>
                         )}
