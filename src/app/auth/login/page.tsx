@@ -29,7 +29,7 @@ import {
 } from 'firebase/auth';
 import { auth, firestore } from '@/lib/firebase';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
@@ -42,7 +42,9 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  
+  const [view, setView] = useState<'selection' | 'email' | 'phone'>('selection');
+
+  // Phone state
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
@@ -59,16 +61,16 @@ export default function LoginPage() {
   });
 
   useEffect(() => {
-    // This effect sets up the invisible reCAPTCHA verifier.
-    if (!recaptchaVerifierRef.current) {
+    // This effect sets up the invisible reCAPTCHA verifier for phone auth.
+    if (view === 'phone' && !recaptchaVerifierRef.current) {
       recaptchaVerifierRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
         'size': 'invisible',
-        'callback': (response: any) => {
-          // reCAPTCHA solved, you can now send the OTP.
-        }
+        'callback': (response: any) => {},
       });
+      // It's important to render the reCAPTCHA container
+      recaptchaVerifierRef.current.render();
     }
-  }, []);
+  }, [view]);
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
@@ -169,15 +171,52 @@ export default function LoginPage() {
     }
   };
 
-  return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-10rem)] py-12">
+  const renderSelection = () => (
       <Card className="mx-auto max-w-sm">
         <CardHeader className="space-y-1 text-center">
           <Icons.logo className="mx-auto h-8 w-8 text-primary" />
           <CardTitle className="text-2xl font-bold font-headline">Welcome Back</CardTitle>
           <CardDescription>
-            Enter your credentials to login to your account
+            Choose a method to login to your account
           </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+            <Button onClick={() => setView('email')} className="w-full">
+                Continue with Email
+            </Button>
+            <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleGoogleLogin}
+                disabled={isLoading}
+            >
+                {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                <Icons.google className="mr-2 h-4 w-4" />
+                )}
+                Login with Google
+            </Button>
+             <Button onClick={() => setView('phone')} variant="outline" className="w-full">
+                Continue with Phone
+            </Button>
+             <div className="mt-4 text-center text-sm">
+                Don&apos;t have an account?{' '}
+                <Link href="/auth/signup" className="underline">
+                Sign up
+                </Link>
+            </div>
+        </CardContent>
+      </Card>
+  );
+
+  const renderEmailLogin = () => (
+      <Card className="mx-auto max-w-sm">
+        <CardHeader className="relative flex-row items-center justify-center pt-8">
+           <Button variant="ghost" size="icon" className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8" onClick={() => setView('selection')}>
+              <ArrowLeft className="h-4 w-4" />
+           </Button>
+          <CardTitle className="text-2xl font-bold font-headline text-center">Login with Email</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -213,87 +252,77 @@ export default function LoginPage() {
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Login with Email
+              Login
             </Button>
           </form>
-          
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
-              </span>
-            </div>
-          </div>
-          
-          <Button
-            variant="outline"
-            className="w-full mb-4"
-            onClick={handleGoogleLogin}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Icons.google className="mr-2 h-4 w-4" />
-            )}
-            Login with Google
-          </Button>
-          
-          <div id="recaptcha-container"></div>
-          
-          {!isOtpSent ? (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="+1 123 456 7890"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  disabled={phoneIsLoading}
-                />
-              </div>
-              <Button onClick={handleSendOtp} className="w-full" disabled={phoneIsLoading || !phone}>
-                {phoneIsLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Send OTP
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="otp">Enter OTP</Label>
-                <Input
-                  id="otp"
-                  type="text"
-                  placeholder="123456"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  disabled={phoneIsLoading}
-                  maxLength={6}
-                />
-              </div>
-              <Button onClick={handleVerifyOtp} className="w-full" disabled={phoneIsLoading || otp.length < 6}>
-                {phoneIsLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Verify OTP & Login
-              </Button>
-              <Button variant="link" size="sm" onClick={() => setIsOtpSent(false)} disabled={phoneIsLoading} className="p-0 h-auto w-full text-xs">
-                Entered the wrong number?
-              </Button>
-            </div>
-          )}
-          
-          <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
-            <Link href="/auth/signup" className="underline">
-              Sign up
-            </Link>
-          </div>
         </CardContent>
       </Card>
+  );
+
+  const renderPhoneLogin = () => (
+     <Card className="mx-auto max-w-sm">
+        <CardHeader className="relative flex-row items-center justify-center pt-8">
+          <Button variant="ghost" size="icon" className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8" onClick={() => {
+              setView('selection');
+              setIsOtpSent(false);
+          }}>
+              <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <CardTitle className="text-2xl font-bold font-headline text-center">Login with Phone</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <div id="recaptcha-container"></div>
+            {!isOtpSent ? (
+                <div className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="+1 123 456 7890"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    disabled={phoneIsLoading}
+                    />
+                </div>
+                <Button onClick={handleSendOtp} className="w-full" disabled={phoneIsLoading || !phone}>
+                    {phoneIsLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    Send OTP
+                </Button>
+                </div>
+            ) : (
+                <div className="space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="otp">Enter OTP</Label>
+                    <Input
+                    id="otp"
+                    type="text"
+                    placeholder="123456"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    disabled={phoneIsLoading}
+                    maxLength={6}
+                    />
+                </div>
+                <Button onClick={handleVerifyOtp} className="w-full" disabled={phoneIsLoading || otp.length < 6}>
+                    {phoneIsLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                    Verify OTP & Login
+                </Button>
+                 <Button variant="link" size="sm" onClick={() => setIsOtpSent(false)} disabled={phoneIsLoading} className="p-0 h-auto w-full text-xs">
+                    Entered the wrong number?
+                </Button>
+                </div>
+            )}
+        </CardContent>
+     </Card>
+  );
+
+  return (
+    <div className="flex items-center justify-center min-h-[calc(100vh-10rem)] py-12">
+      {view === 'selection' && renderSelection()}
+      {view === 'email' && renderEmailLogin()}
+      {view === 'phone' && renderPhoneLogin()}
     </div>
   );
 }
+
