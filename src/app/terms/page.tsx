@@ -1,4 +1,14 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+
 export default function TermsOfServicePage() {
+    const [currentDate, setCurrentDate] = useState('');
+
+    useEffect(() => {
+        setCurrentDate(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }));
+    }, []);
+
   return (
     <div className="bg-background">
       <section className="w-full py-12 md:py-24 lg:py-32">
@@ -8,7 +18,7 @@ export default function TermsOfServicePage() {
               Terms of Service
             </h1>
             <p className="text-lg text-muted-foreground">
-              Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              Last updated: {currentDate}
             </p>
 
             <h2>1. Agreement to Terms</h2>

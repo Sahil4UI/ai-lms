@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { Icons } from './icons';
 
 type CertificateProps = {
@@ -6,11 +9,15 @@ type CertificateProps = {
 };
 
 export function Certificate({ studentName, courseTitle }: CertificateProps) {
-  const currentDate = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const [currentDate, setCurrentDate] = useState('');
+
+  useEffect(() => {
+    setCurrentDate(new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }));
+  }, []);
 
   return (
     <div className="certificate-print-area bg-background text-foreground border-4 border-primary p-8 rounded-lg shadow-2xl w-full aspect-[1.414/1] flex flex-col items-center justify-center relative overflow-hidden">
