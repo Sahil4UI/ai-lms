@@ -16,8 +16,8 @@
     --secondary-foreground: 240 5.9% 10%;
     --muted: 240 10% 95%;
     --muted-foreground: 240 3.8% 46.1%;
-    --accent: 180 85% 45%;
-    --accent-foreground: 180 40% 98%;
+    --accent: 260 100% 96%;
+    --accent-foreground: 260 80% 50%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 240 10% 3.9% / 0.05;
@@ -39,8 +39,8 @@
     --secondary-foreground: 210 40% 98%;
     --muted: 260 20% 15% / 0.7;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 180 95% 60%;
-    --accent-foreground: 222 47% 11.2%;
+    --accent: 260 30% 18%;
+    --accent-foreground: 260 95% 85%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 210 40% 98% / 0.05;
@@ -63,9 +63,9 @@
     background-attachment: fixed;
   }
   :root {
-      background-image: linear-gradient(to bottom right, hsl(180, 100%, 92%), hsl(260, 100%, 92%));
+      background-image: linear-gradient(to bottom right, hsl(220, 100%, 94%), hsl(260, 100%, 94%));
   }
   .dark {
-      background-image: linear-gradient(to bottom right, hsl(260, 40%, 8%), hsl(220, 50%, 12%));
+      background-image: linear-gradient(to bottom right, hsl(220, 40%, 10%), hsl(260, 40%, 10%));
   }
 }
