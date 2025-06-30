@@ -141,12 +141,12 @@ export default function Home() {
                     See what our students have to say about their learning experience.
                 </p>
             </div>
-            <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mx-auto grid max-w-5xl items-stretch gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {testimonials.map((testimonial, index) => (
-                     <Card key={index} className="bg-muted/40 border-border/60 animate-in fade-in slide-in-from-bottom-12 duration-500 ease-in-out" style={{ animationDelay: `${index * 150}ms`}}>
-                        <CardContent className="p-6">
+                     <Card key={index} className="h-full flex flex-col bg-muted/40 border-border/60 animate-in fade-in slide-in-from-bottom-12 duration-500 ease-in-out" style={{ animationDelay: `${index * 150}ms`}}>
+                        <CardContent className="p-6 flex flex-col flex-grow">
                             <Quote className="h-8 w-8 text-primary mb-4" />
-                            <p className="text-muted-foreground mb-6">{testimonial.quote}</p>
+                            <p className="text-muted-foreground mb-6 flex-grow">{testimonial.quote}</p>
                             <div className="flex items-center gap-4">
                                 <Avatar>
                                     <AvatarImage src={testimonial.avatar} alt={testimonial.name} data-ai-hint="person face"/>

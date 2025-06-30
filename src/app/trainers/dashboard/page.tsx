@@ -1,3 +1,9 @@
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
+import { Loader2, Book, DollarSign, PlusCircle, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -15,11 +21,28 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign, Book, Users, PlusCircle } from 'lucide-react';
 import { courses } from '@/lib/data';
 
 export default function TrainerDashboardPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
   const trainerCourses = courses.slice(0, 2);
+
+  useEffect(() => {
+    // If not loading and no user, redirect to login
+    if (!loading && !user) {
+      router.push('/auth/login');
+    }
+  }, [user, loading, router]);
+
+  // Show a loader while checking auth state or if there's no user
+  if (loading || !user) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -41,17 +64,23 @@ export default function TrainerDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">$12,234.56</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+            <p className="text-xs text-muted-foreground">
+              +20.1% from last month
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Students</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Students
+            </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+2,453</div>
-            <p className="text-xs text-muted-foreground">+180.1% from last month</p>
+            <p className="text-xs text-muted-foreground">
+              +180.1% from last month
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -61,45 +90,47 @@ export default function TrainerDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{trainerCourses.length}</div>
-            <p className="text-xs text-muted-foreground">Your published courses</p>
+            <p className="text-xs text-muted-foreground">
+              Your published courses
+            </p>
           </CardContent>
         </Card>
       </div>
 
       <div className="animate-in fade-in slide-in-from-bottom-8 duration-900">
         <Card>
-            <CardHeader>
+          <CardHeader>
             <CardTitle>My Courses</CardTitle>
             <CardDescription>
-                Manage your courses and view their performance.
+              Manage your courses and view their performance.
             </CardDescription>
-            </CardHeader>
-            <CardContent>
+          </CardHeader>
+          <CardContent>
             <Table>
-                <TableHeader>
+              <TableHeader>
                 <TableRow>
-                    <TableHead>Course</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead className="text-right">Students</TableHead>
+                  <TableHead>Course</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead className="text-right">Students</TableHead>
                 </TableRow>
-                </TableHeader>
-                <TableBody>
+              </TableHeader>
+              <TableBody>
                 {trainerCourses.map((course) => (
-                    <TableRow key={course.id}>
+                  <TableRow key={course.id}>
                     <TableCell className="font-medium">{course.title}</TableCell>
                     <TableCell>
-                        <Badge>Published</Badge>
+                      <Badge>Published</Badge>
                     </TableCell>
                     <TableCell>${course.price}</TableCell>
                     <TableCell className="text-right">
-                        {course.students.toLocaleString()}
+                      {course.students.toLocaleString()}
                     </TableCell>
-                    </TableRow>
+                  </TableRow>
                 ))}
-                </TableBody>
+              </TableBody>
             </Table>
-            </CardContent>
+          </CardContent>
         </Card>
       </div>
     </div>
