@@ -6,7 +6,7 @@ import { Check } from 'lucide-react';
 export default function TrainersPage() {
   const benefits = [
     'Reach a global audience of motivated CS students.',
-    'Earn a competitive 30% revenue share on every course sale.',
+    'Earn competitive revenue from your course sales.',
     'Utilize our easy-to-use platform to create and manage courses.',
     'Leverage our AI tools to enhance your course materials.',
     'Become part of a community of expert instructors.',
@@ -14,7 +14,7 @@ export default function TrainersPage() {
 
   return (
     <div>
-      <section className="w-full py-12 md:py-24 lg:py-32 bg-primary text-primary-foreground">
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-br from-primary to-accent text-primary-foreground">
         <div className="container px-4 md:px-6">
           <div className="mx-auto max-w-3xl text-center space-y-4">
             <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl">
@@ -25,7 +25,7 @@ export default function TrainersPage() {
               and earn revenue by creating courses on our cutting-edge
               platform.
             </p>
-            <Button asChild size="lg" variant="secondary" className="text-primary-foreground bg-accent hover:bg-accent/90">
+            <Button asChild size="lg" variant="secondary" className="text-primary bg-primary-foreground hover:bg-primary-foreground/90">
               <Link href="/trainers/dashboard">Get Started</Link>
             </Button>
           </div>

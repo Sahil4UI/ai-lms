@@ -7,7 +7,6 @@ import {
   CheckCircle,
   PlayCircle,
   Star,
-  Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,8 +16,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { Separator } from '@/components/ui/separator';
 import LectureSummary from './lecture-summary';
+import AiAssistant from './ai-assistant';
 
 export default function CourseDetailPage({ params }: { params: { id: string } }) {
   const course = courses.find((c) => c.id === params.id);
@@ -28,7 +27,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
   }
 
   return (
-    <div className="bg-muted">
+    <div className="bg-background">
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-2">
@@ -39,7 +38,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
             <p className="mt-2 text-lg text-muted-foreground">
               {course.description}
             </p>
-            <div className="flex items-center gap-4 mt-4 text-sm">
+            <div className="flex flex-wrap items-center gap-4 mt-4 text-sm">
               <div className="flex items-center gap-1">
                 <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                 <span>
@@ -49,7 +48,30 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
               <span className="text-muted-foreground">
                 Taught by {course.instructor}
               </span>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                <span>8 hours on-demand video</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <BarChart className="w-4 h-4" />
+                <span>Certificate of completion</span>
+              </div>
             </div>
+            <div className="mt-6">
+                 <Button size="lg">
+                  Enroll Now for ${course.price}
+                </Button>
+            </div>
+          </div>
+          <div className="hidden md:block">
+              <Image
+                src={course.imageUrl}
+                alt={course.title}
+                width={600}
+                height={400}
+                data-ai-hint="online learning"
+                className="w-full object-cover rounded-lg border"
+              />
           </div>
         </div>
       </div>
@@ -57,12 +79,12 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
       <div className="container mx-auto px-4 pb-12">
         <div className="grid md:grid-cols-3 gap-8 items-start">
           <div className="md:col-span-2">
-            <div className="border rounded-lg p-6 bg-background">
+            <div className="border rounded-lg p-6 bg-muted/30">
               <h2 className="text-xl font-bold mb-4">What you'll learn</h2>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {course.whatYoullLearn.map((item, index) => (
                   <li key={index} className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 mt-0.5 text-green-500 shrink-0" />
+                    <CheckCircle className="w-5 h-5 mt-0.5 text-primary shrink-0" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -93,36 +115,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
           </div>
 
           <div className="md:sticky top-24">
-            <div className="rounded-lg overflow-hidden border bg-background">
-              <Image
-                src={course.imageUrl}
-                alt={course.title}
-                width={600}
-                height={400}
-                data-ai-hint="online learning"
-                className="w-full object-cover"
-              />
-              <div className="p-6">
-                <div className="text-4xl font-bold mb-4">${course.price}</div>
-                <Button size="lg" className="w-full">
-                  Enroll Now
-                </Button>
-                <p className="text-xs text-center mt-2 text-muted-foreground">
-                  Lifetime access
-                </p>
-                <Separator className="my-4" />
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
-                    <span>8 hours on-demand video</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <BarChart className="w-4 h-4" />
-                    <span>Certificate of completion</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
+            <AiAssistant course={course} />
           </div>
         </div>
       </div>
