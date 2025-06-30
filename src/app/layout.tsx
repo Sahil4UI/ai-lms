@@ -32,7 +32,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={cn('min-h-screen bg-background font-body antialiased')}>
+      <body className={cn('min-h-screen font-body antialiased')}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
@@ -40,7 +40,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            <div className="relative flex min-h-dvh flex-col bg-background">
+            <div className="relative flex min-h-dvh flex-col">
               <Header />
               <main className="flex-1">{children}</main>
               <Footer />
