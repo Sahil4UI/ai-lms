@@ -52,3 +52,21 @@
     background-attachment: fixed;
   }
 }
+
+/* Screen Recording Protection */
+@layer utilities {
+  .screen-recording-overlay {
+    display: none;
+  }
+  @media (display-capture) {
+    .screen-recording-overlay {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      inset: 0;
+      background-color: black;
+      z-index: 9999;
+    }
+  }
+}

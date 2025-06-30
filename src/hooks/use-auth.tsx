@@ -3,13 +3,23 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, type User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { Preloader } from '@/components/preloader';
 import { auth, firestore } from '@/lib/firebase';
 
+interface UserData {
+  uid: string;
+  displayName: string;
+  email: string;
+  photoURL?: string;
+  role: 'student' | 'trainer';
+  enrolledCourses?: string[];
+  // any other fields from your user document
+}
+
 interface AuthContextType {
   user: User | null;
-  userData: any | null;
+  userData: UserData | null;
   loading: boolean;
 }
 
@@ -21,30 +31,38 @@ const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [userData, setUserData] = useState<any | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setUser(user);
-        const userDocRef = doc(firestore, 'users', user.uid);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists()) {
-          setUserData(userDoc.data());
-        } else {
-          setUserData(null);
-        }
-      } else {
-        setUser(null);
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      if (!user) {
+        // No user, so we can stop loading
         setUserData(null);
+        setTimeout(() => setLoading(false), 500);
       }
-      // Add a small delay to prevent flash of content
-      setTimeout(() => setLoading(false), 500);
+      // If there is a user, the snapshot listener below will handle setting data and loading state
     });
 
-    return () => unsubscribe();
+    return () => unsubscribeAuth();
   }, []);
+  
+  useEffect(() => {
+    if (user) {
+        const userDocRef = doc(firestore, 'users', user.uid);
+        const unsubscribeSnapshot = onSnapshot(userDocRef, (userDoc) => {
+             if (userDoc.exists()) {
+                setUserData(userDoc.data() as UserData);
+             } else {
+                setUserData(null);
+             }
+             setTimeout(() => setLoading(false), 500);
+        });
+        return () => unsubscribeSnapshot();
+    }
+  }, [user]);
+
 
   return (
     <AuthContext.Provider value={{ user, userData, loading }}>

@@ -1,5 +1,7 @@
+'use client';
+
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 import { type Course } from '@/lib/data';
 import {
   Clock,
@@ -10,6 +12,9 @@ import {
   Lock,
   FileText,
   Award,
+  Loader2,
+  BadgePercent,
+  PartyPopper,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,53 +29,91 @@ import { cn } from '@/lib/utils';
 import { doc, getDoc } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
 import ReactMarkdown from 'react-markdown';
-import type { Metadata } from 'next';
+import { useAuth } from '@/hooks/use-auth';
+import { useEffect, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { applyCoupon, enrollInCourse } from './actions';
 
-// Revalidate this page every 60 seconds
-export const revalidate = 60;
+export default function CourseDetailPage({ params }: { params: { id: string } }) {
+  const [course, setCourse] = useState<Course | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { user, userData } = useAuth();
+  const router = useRouter();
+  const { toast } = useToast();
 
-type Props = {
-  params: { id: string }
-}
+  const [couponCode, setCouponCode] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [finalPrice, setFinalPrice] = useState(0);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [isEnrolling, setIsEnrolling] = useState(false);
+  
+  const isEnrolled = userData?.enrolledCourses?.includes(params.id);
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const courseRef = doc(firestore, 'courses', params.id);
-  const courseSnap = await getDoc(courseRef);
+  useEffect(() => {
+    const fetchCourse = async () => {
+      const courseRef = doc(firestore, 'courses', params.id);
+      const courseSnap = await getDoc(courseRef);
 
-  if (!courseSnap.exists()) {
-    return {
-      title: 'Course Not Found'
+      if (!courseSnap.exists()) {
+        notFound();
+      }
+
+      const courseData = { id: courseSnap.id, ...courseSnap.data() } as Course;
+      setCourse(courseData);
+      setFinalPrice(courseData.price);
+      setLoading(false);
+    };
+
+    fetchCourse();
+  }, [params.id]);
+
+  if (loading) {
+    return <div className="flex h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+  }
+  
+  if (!course) {
+      return notFound();
+  }
+
+  const handleApplyCoupon = async () => {
+    setIsApplyingCoupon(true);
+    const result = await applyCoupon(couponCode);
+    if (result.error) {
+        toast({ title: 'Error', description: result.error, variant: 'destructive' });
+        setDiscount(0);
+        setFinalPrice(course.price);
+    } else {
+        const discountAmount = (course.price * result.discount!) / 100;
+        setDiscount(result.discount!);
+        setFinalPrice(course.price - discountAmount);
+        toast({ title: 'Coupon Applied!', description: `You received a ${result.discount}% discount.` });
     }
-  }
-  const course = courseSnap.data() as Course;
+    setIsApplyingCoupon(false);
+  };
 
-  return {
-    title: course.title,
-    description: course.description,
-    openGraph: {
-      title: course.title,
-      description: course.description,
-      images: [
-        {
-          url: course.imageUrl,
-          width: 1200,
-          height: 630,
-          alt: course.title,
-        },
-      ],
-    },
-  }
-}
+  const handleEnroll = async () => {
+      if (!user) {
+          router.push('/auth/login');
+          return;
+      }
+      setIsEnrolling(true);
+      const result = await enrollInCourse(course.id, user.uid, discount > 0 ? couponCode : undefined);
+      if (result.error) {
+          toast({ title: 'Enrollment Failed', description: result.error, variant: 'destructive' });
+      } else {
+          toast({
+              title: 'Congratulations!',
+              description: `You have successfully enrolled in "${course.title}".`,
+              duration: 5000,
+          });
+          // Optimistically update the UI while revalidation happens in the background
+          router.refresh();
+      }
+      setIsEnrolling(false);
+  };
 
-export default async function CourseDetailPage({ params }: { params: { id: string } }) {
-  const courseRef = doc(firestore, 'courses', params.id);
-  const courseSnap = await getDoc(courseRef);
-
-  if (!courseSnap.exists()) {
-    notFound();
-  }
-
-  const course = { id: courseSnap.id, ...courseSnap.data() } as Course;
 
   return (
     <div className="bg-background">
@@ -103,12 +146,45 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
                 <span>Certificate of completion</span>
               </div>
             </div>
-            <div className="mt-6">
-                 <Button size="lg">
-                  Enroll Now for ${course.price}
+            
+            {!isEnrolled && (
+              <div className="mt-6 space-y-4 max-w-sm">
+                <div className="space-y-2">
+                    <Label htmlFor="coupon">Have a coupon?</Label>
+                    <div className="flex space-x-2">
+                        <Input id="coupon" placeholder="Enter coupon code" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} />
+                        <Button onClick={handleApplyCoupon} disabled={isApplyingCoupon || !couponCode}>
+                            {isApplyingCoupon ? <Loader2 className="animate-spin" /> : 'Apply'}
+                        </Button>
+                    </div>
+                </div>
+                <div>
+                  <p className="text-4xl font-bold">
+                    ${finalPrice.toFixed(2)}
+                    {discount > 0 && (
+                      <span className="text-lg font-normal text-muted-foreground line-through ml-2">${course.price.toFixed(2)}</span>
+                    )}
+                  </p>
+                  {discount > 0 && (
+                    <p className="text-sm text-green-400 flex items-center gap-1"><BadgePercent className="w-4 h-4" /> {discount}% discount applied!</p>
+                  )}
+                </div>
+                 <Button size="lg" className="w-full" onClick={handleEnroll} disabled={isEnrolling}>
+                  {isEnrolling ? <Loader2 className="animate-spin" /> : 'Enroll Now'}
                 </Button>
-            </div>
+              </div>
+            )}
+             {isEnrolled && (
+              <div className="mt-6 flex items-center gap-3 bg-primary/10 text-primary border border-primary/20 rounded-lg p-4 max-w-sm">
+                  <PartyPopper className="w-8 h-8"/>
+                  <div>
+                      <h3 className="font-bold">You are enrolled in this course!</h3>
+                      <p className="text-sm">You have full lifetime access. Start learning below.</p>
+                  </div>
+              </div>
+            )}
           </div>
+
           <div className="hidden md:block animate-in fade-in slide-in-from-right-8 duration-700">
               <Image
                 src={course.imageUrl}
@@ -139,9 +215,9 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
 
             <div className="mt-8">
               <h2 className="text-xl font-bold mb-4">Course Content</h2>
-              <Accordion type="single" collapsible className="w-full">
+              <Accordion type="single" collapsible className="w-full" defaultValue="item-0">
                 {course.lectures?.map((lecture, index) => {
-                  const isLocked = index >= 3;
+                  const isLocked = !isEnrolled && index >= 3;
                   return (
                     <AccordionItem value={`item-${index}`} key={lecture.id} disabled={isLocked}>
                       <AccordionTrigger
@@ -149,7 +225,7 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
                         className={cn('hover:no-underline', isLocked && 'cursor-not-allowed text-muted-foreground')}
                       >
                         <div className="flex items-center gap-3 flex-1 text-left">
-                          {isLocked ? <Lock className="w-5 h-5 shrink-0" /> : <PlayCircle className="w-5 h-5 shrink-0" />}
+                          {isLocked ? <Lock className="w-5 h-5 shrink-0" /> : <PlayCircle className="w-5 h-5 shrink-0 text-primary" />}
                           <div className="flex flex-col">
                             <span className="font-medium">{lecture.title}</span>
                              <span className="text-xs text-muted-foreground">{lecture.duration}</span>
@@ -160,14 +236,19 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
                       <AccordionContent className="pl-4 pr-2">
                         {!isLocked ? (
                           <div className="space-y-4">
-                            <video
-                              key={lecture.videoUrl}
-                              src={lecture.videoUrl}
-                              controls
-                              className="w-full rounded-lg border bg-black"
-                            >
-                              Your browser does not support the video tag.
-                            </video>
+                            <div className="relative aspect-video">
+                               <video
+                                key={lecture.videoUrl}
+                                src={lecture.videoUrl}
+                                controls
+                                className="w-full h-full rounded-lg border bg-black"
+                               >
+                                Your browser does not support the video tag.
+                               </video>
+                               <div className="screen-recording-overlay">
+                                  <p className="text-white text-lg font-semibold">Screen recording is not permitted.</p>
+                               </div>
+                            </div>
                              {lecture.notes && (
                                 <div className="prose prose-sm dark:prose-invert max-w-none border-t pt-4">
                                   <h3 className="flex items-center gap-2 text-base font-semibold"><FileText className="w-4 h-4" />Lecture Notes</h3>
