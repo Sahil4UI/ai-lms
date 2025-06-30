@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Book, LayoutDashboard, TestTube2, Users } from 'lucide-react';
+import { Book, LayoutDashboard, TestTube2, Users, TicketPercent } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ const navItems = [
   { href: '/admin/dashboard/users', label: 'Users', icon: Users },
   { href: '/admin/dashboard/courses', label: 'Courses', icon: Book },
   { href: '/admin/dashboard/testimonials', label: 'Testimonials', icon: TestTube2 },
+  { href: '/admin/dashboard/coupons', label: 'Coupons', icon: TicketPercent },
 ];
 
 export default function AdminDashboardLayout({
@@ -56,7 +57,7 @@ export default function AdminDashboardLayout({
           {navItems.map(item => (
             <Link key={item.href} href={item.href}>
               <Button
-                variant={pathname === item.href ? 'default' : 'ghost'}
+                variant={pathname.startsWith(item.href) ? 'default' : 'ghost'}
                 className="w-full justify-start gap-2"
               >
                 <item.icon className="h-4 w-4" />

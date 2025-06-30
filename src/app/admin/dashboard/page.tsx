@@ -1,13 +1,13 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Book, TestTube2 } from 'lucide-react';
+import { Users, Book, TestTube2, TicketPercent } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
 
 export default function AdminDashboardPage() {
-    const [stats, setStats] = useState({ users: 0, courses: 0, testimonials: 0 });
+    const [stats, setStats] = useState({ users: 0, courses: 0, testimonials: 0, coupons: 0 });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -16,13 +16,15 @@ export default function AdminDashboardPage() {
                 const usersPromise = getDocs(collection(firestore, 'users'));
                 const coursesPromise = getDocs(collection(firestore, 'courses'));
                 const testimonialsPromise = getDocs(collection(firestore, 'testimonials'));
+                const couponsPromise = getDocs(query(collection(firestore, 'coupons'), where('isActive', '==', true)));
 
-                const [usersSnapshot, coursesSnapshot, testimonialsSnapshot] = await Promise.all([usersPromise, coursesPromise, testimonialsPromise]);
+                const [usersSnapshot, coursesSnapshot, testimonialsSnapshot, couponsSnapshot] = await Promise.all([usersPromise, coursesPromise, testimonialsPromise, couponsPromise]);
                 
                 setStats({
                     users: usersSnapshot.size,
                     courses: coursesSnapshot.size,
                     testimonials: testimonialsSnapshot.size,
+                    coupons: couponsSnapshot.size,
                 });
             } catch (error) {
                 console.error("Failed to fetch stats:", error);
@@ -38,7 +40,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -64,6 +66,15 @@ export default function AdminDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{loading ? '...' : stats.testimonials}</div>
+          </CardContent>
+        </Card>
+         <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Coupons</CardTitle>
+            <TicketPercent className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{loading ? '...' : stats.coupons}</div>
           </CardContent>
         </Card>
       </div>

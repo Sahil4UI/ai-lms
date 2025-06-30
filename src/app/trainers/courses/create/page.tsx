@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { firestore, storage } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, getDocs, query, where } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from '@/components/ui/button';
@@ -38,6 +38,37 @@ const courseSchema = z.object({
 });
 
 type CourseFormValues = z.infer<typeof courseSchema>;
+
+// This function creates a notification in Firestore.
+// A separate backend service (e.g., a Firebase Cloud Function) should listen to this collection
+// to actually process and send the emails using a service like SendGrid or Mailgun.
+async function triggerNewCourseNotification(courseId: string, courseTitle: string) {
+  try {
+    const usersCollection = collection(firestore, 'users');
+    const q = query(usersCollection, where('role', '==', 'student'));
+    const studentsSnapshot = await getDocs(q);
+
+    if (studentsSnapshot.empty) {
+      console.log("No students to notify.");
+      return;
+    }
+    
+    // You could also fetch emails and add them to the notification doc,
+    // but for large numbers of users, it's better to handle that in the backend function.
+    await addDoc(collection(firestore, 'notifications'), {
+        type: 'new_course',
+        courseId,
+        courseTitle,
+        createdAt: serverTimestamp(),
+        // This notification is for all students.
+        recipient: 'all_students', 
+    });
+
+  } catch (error) {
+    console.error("Failed to create new course notification:", error);
+    // Don't block the UI for this, just log the error.
+  }
+}
 
 export default function CreateCoursePage() {
   const router = useRouter();
@@ -131,6 +162,9 @@ export default function CreateCoursePage() {
         students: 0,
         createdAt: serverTimestamp(),
       });
+
+      // Trigger the email notification process
+      await triggerNewCourseNotification(courseId, data.title);
       
       toast({ title: 'Course Created!', description: 'Your new course has been successfully uploaded.' });
       router.push('/trainers/dashboard');
