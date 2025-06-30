@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CourseCard } from '@/components/course-card';
-import { courses } from '@/lib/data';
+import { type Course } from '@/lib/data';
 import {
   Carousel,
   CarouselContent,
@@ -18,6 +18,8 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { HeroCarousel } from '@/components/hero-carousel';
+import { collection, getDocs, limit, query, orderBy } from 'firebase/firestore';
+import { firestore } from '@/lib/firebase';
 
 const testimonials = [
     {
@@ -40,8 +42,12 @@ const testimonials = [
     }
 ]
 
-export default function Home() {
-  const featuredCourses = courses.slice(0, 6);
+export default async function Home() {
+  const coursesCol = collection(firestore, 'courses');
+  const q = query(coursesCol, orderBy('createdAt', 'desc'), limit(6));
+  const coursesSnapshot = await getDocs(q);
+  const featuredCourses: Course[] = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+
 
   return (
     <div className="flex flex-col min-h-[100dvh]">
@@ -104,25 +110,29 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <Carousel
-            opts={{
-              align: 'start',
-              loop: true,
-            }}
-            className="w-full max-w-6xl mx-auto"
-          >
-            <CarouselContent>
-              {featuredCourses.map((course) => (
-                <CarouselItem key={course.id} className="md:basis-1/2 lg:basis-1/3">
-                  <div className="p-1 h-full">
-                    <CourseCard course={course} />
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="hidden sm:flex" />
-            <CarouselNext className="hidden sm:flex" />
-          </Carousel>
+          {featuredCourses.length > 0 ? (
+            <Carousel
+                opts={{
+                align: 'start',
+                loop: true,
+                }}
+                className="w-full max-w-6xl mx-auto"
+            >
+                <CarouselContent>
+                {featuredCourses.map((course) => (
+                    <CarouselItem key={course.id} className="md:basis-1/2 lg:basis-1/3">
+                    <div className="p-1 h-full">
+                        <CourseCard course={course} />
+                    </div>
+                    </CarouselItem>
+                ))}
+                </CarouselContent>
+                <CarouselPrevious className="hidden sm:flex" />
+                <CarouselNext className="hidden sm:flex" />
+            </Carousel>
+          ) : (
+            <p className="text-center text-muted-foreground">No courses available yet. Check back soon!</p>
+          )}
           <div className="mt-12 flex justify-center">
             <Button asChild size="lg">
               <Link href="/courses">View All Courses</Link>

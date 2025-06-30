@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { courses } from '@/lib/data';
+import { type Course } from '@/lib/data';
 import {
   Clock,
   BarChart,
@@ -20,13 +20,21 @@ import {
 import LectureSummary from './lecture-summary';
 import AiAssistant from './ai-assistant';
 import { cn } from '@/lib/utils';
+import { doc, getDoc } from 'firebase/firestore';
+import { firestore } from '@/lib/firebase';
 
-export default function CourseDetailPage({ params }: { params: { id: string } }) {
-  const course = courses.find((c) => c.id === params.id);
+// Revalidate this page every 60 seconds
+export const revalidate = 60;
 
-  if (!course) {
+export default async function CourseDetailPage({ params }: { params: { id: string } }) {
+  const courseRef = doc(firestore, 'courses', params.id);
+  const courseSnap = await getDoc(courseRef);
+
+  if (!courseSnap.exists()) {
     notFound();
   }
+
+  const course = { id: courseSnap.id, ...courseSnap.data() } as Course;
 
   return (
     <div className="bg-background">
@@ -84,7 +92,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
             <div className="border rounded-lg p-6 bg-muted/30">
               <h2 className="text-xl font-bold mb-4">What you'll learn</h2>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {course.whatYoullLearn.map((item, index) => (
+                {course.whatYoullLearn?.map((item, index) => (
                   <li key={index} className="flex items-start gap-2">
                     <CheckCircle className="w-5 h-5 mt-0.5 text-primary shrink-0" />
                     <span>{item}</span>
@@ -96,7 +104,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
             <div className="mt-8">
               <h2 className="text-xl font-bold mb-4">Course Content</h2>
               <Accordion type="single" collapsible className="w-full">
-                {course.lectures.map((lecture, index) => {
+                {course.lectures?.map((lecture, index) => {
                   const isLocked = index >= 3;
                   return (
                     <AccordionItem value={`item-${index}`} key={lecture.id} disabled={isLocked}>

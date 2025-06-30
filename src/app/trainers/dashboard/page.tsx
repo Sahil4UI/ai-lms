@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import {
@@ -28,7 +29,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { courses } from '@/lib/data';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,21 +37,46 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { firestore } from '@/lib/firebase';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { type Course } from '@/lib/data';
 
 export default function TrainerDashboardPage() {
-  const { user, loading } = useAuth();
+  const { user, userData, loading } = useAuth();
   const router = useRouter();
-  const trainerCourses = courses.slice(0, 2);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isFetching, setIsFetching] = useState(true);
 
   useEffect(() => {
-    // If not loading and no user, redirect to login
-    if (!loading && !user) {
+    // Redirect if not logged in, or if user is not a trainer
+    if (!loading && (!user || userData?.role !== 'trainer')) {
       router.push('/auth/login');
     }
-  }, [user, loading, router]);
+  }, [user, userData, loading, router]);
 
-  // Show a loader while checking auth state or if there's no user
-  if (loading || !user) {
+  useEffect(() => {
+    if (user && userData?.role === 'trainer') {
+      const fetchCourses = async () => {
+        setIsFetching(true);
+        const coursesCol = collection(firestore, 'courses');
+        const q = query(
+          coursesCol,
+          where('instructorId', '==', user.uid),
+          orderBy('createdAt', 'desc')
+        );
+        const querySnapshot = await getDocs(q);
+        const fetchedCourses = querySnapshot.docs.map(
+          (doc) => ({ id: doc.id, ...doc.data() } as Course)
+        );
+        setCourses(fetchedCourses);
+        setIsFetching(false);
+      };
+
+      fetchCourses();
+    }
+  }, [user, userData]);
+
+  if (loading || isFetching || !userData || userData.role !== 'trainer') {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -65,9 +90,11 @@ export default function TrainerDashboardPage() {
         <h1 className="font-headline text-3xl font-bold tracking-tight">
           Trainer Dashboard
         </h1>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Create New Course
+        <Button asChild>
+          <Link href="/trainers/courses/create">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Create New Course
+          </Link>
         </Button>
       </div>
 
@@ -78,9 +105,9 @@ export default function TrainerDashboardPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$12,234.56</div>
+            <div className="text-2xl font-bold">$0.00</div>
             <p className="text-xs text-muted-foreground">
-              +20.1% from last month
+              Revenue tracking coming soon
             </p>
           </CardContent>
         </Card>
@@ -92,9 +119,9 @@ export default function TrainerDashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+2,453</div>
+            <div className="text-2xl font-bold">0</div>
             <p className="text-xs text-muted-foreground">
-              +180.1% from last month
+              Across all your courses
             </p>
           </CardContent>
         </Card>
@@ -104,7 +131,7 @@ export default function TrainerDashboardPage() {
             <Book className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{trainerCourses.length}</div>
+            <div className="text-2xl font-bold">{courses.length}</div>
             <p className="text-xs text-muted-foreground">
               Your published courses
             </p>
@@ -132,38 +159,46 @@ export default function TrainerDashboardPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {trainerCourses.map((course) => (
-                  <TableRow key={course.id}>
-                    <TableCell className="font-medium">{course.title}</TableCell>
-                    <TableCell>
-                      <Badge>Published</Badge>
-                    </TableCell>
-                    <TableCell>${course.price}</TableCell>
-                    <TableCell>
-                      {course.students.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Course actions</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem>Edit Course Details</DropdownMenuItem>
-                          <DropdownMenuItem>Manage Content</DropdownMenuItem>
-                          <DropdownMenuItem>Create Quiz</DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
-                            Delete Course
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                {courses.length > 0 ? (
+                  courses.map((course) => (
+                    <TableRow key={course.id}>
+                      <TableCell className="font-medium">{course.title}</TableCell>
+                      <TableCell>
+                        <Badge>Published</Badge>
+                      </TableCell>
+                      <TableCell>${course.price}</TableCell>
+                      <TableCell>
+                        {course.students.toLocaleString()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Course actions</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem>Edit Course Details</DropdownMenuItem>
+                            <DropdownMenuItem>Manage Content</DropdownMenuItem>
+                            <DropdownMenuItem>Create Quiz</DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                              Delete Course
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center h-24">
+                      You haven't created any courses yet.
                     </TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </CardContent>

@@ -1,9 +1,16 @@
 import { Input } from '@/components/ui/input';
 import { CourseCard } from '@/components/course-card';
-import { courses } from '@/lib/data';
+import { type Course } from '@/lib/data';
 import { Search } from 'lucide-react';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { firestore } from '@/lib/firebase';
 
-export default function CoursesPage() {
+export default async function CoursesPage() {
+  const coursesCol = collection(firestore, 'courses');
+  const q = query(coursesCol, orderBy('createdAt', 'desc'));
+  const coursesSnapshot = await getDocs(q);
+  const courses: Course[] = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+
   return (
     <div className="container mx-auto px-4 py-8">
       <header className="mb-8 text-center animate-in fade-in slide-in-from-bottom-8 duration-500">
@@ -21,11 +28,15 @@ export default function CoursesPage() {
           <Input placeholder="Search for courses..." className="pl-10" />
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 animate-in fade-in slide-in-from-bottom-8 duration-900">
-        {courses.map((course) => (
-          <CourseCard key={course.id} course={course} />
-        ))}
-      </div>
+      {courses.length > 0 ? (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 animate-in fade-in slide-in-from-bottom-8 duration-900">
+          {courses.map((course) => (
+            <CourseCard key={course.id} course={course} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-center text-muted-foreground mt-12">No courses have been created yet. Be the first to create one!</p>
+      )}
     </div>
   );
 }
