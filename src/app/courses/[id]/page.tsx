@@ -9,6 +9,7 @@ import {
   Star,
   Lock,
   FileText,
+  Award,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,9 +24,43 @@ import { cn } from '@/lib/utils';
 import { doc, getDoc } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
 import ReactMarkdown from 'react-markdown';
+import type { Metadata } from 'next';
 
 // Revalidate this page every 60 seconds
 export const revalidate = 60;
+
+type Props = {
+  params: { id: string }
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const courseRef = doc(firestore, 'courses', params.id);
+  const courseSnap = await getDoc(courseRef);
+
+  if (!courseSnap.exists()) {
+    return {
+      title: 'Course Not Found'
+    }
+  }
+  const course = courseSnap.data() as Course;
+
+  return {
+    title: course.title,
+    description: course.description,
+    openGraph: {
+      title: course.title,
+      description: course.description,
+      images: [
+        {
+          url: course.imageUrl,
+          width: 1200,
+          height: 630,
+          alt: course.title,
+        },
+      ],
+    },
+  }
+}
 
 export default async function CourseDetailPage({ params }: { params: { id: string } }) {
   const courseRef = doc(firestore, 'courses', params.id);
@@ -64,7 +99,7 @@ export default async function CourseDetailPage({ params }: { params: { id: strin
                 <span>{course.lectures.length} lectures</span>
               </div>
               <div className="flex items-center gap-2">
-                <BarChart className="w-4 h-4" />
+                <Award className="w-4 h-4" />
                 <span>Certificate of completion</span>
               </div>
             </div>

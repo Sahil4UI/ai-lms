@@ -88,7 +88,8 @@ export function Footer() {
                 <h4 className="font-semibold">Company</h4>
                 <Link href="/careers" className="text-sm text-muted-foreground hover:text-primary">Careers</Link>
                 <Link href="/contact" className="text-sm text-muted-foreground hover:text-primary">Contact Us</Link>
-                 <Link href="#" className="text-sm text-muted-foreground hover:text-primary">Blog</Link>
+                <Link href="/privacy" className="text-sm text-muted-foreground hover:text-primary">Privacy Policy</Link>
+                <Link href="/terms" className="text-sm text-muted-foreground hover:text-primary">Terms of Service</Link>
             </div>
 
             <div className="flex flex-col gap-4">
