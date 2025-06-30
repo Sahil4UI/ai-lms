@@ -16,31 +16,31 @@ import { ParticlesBackground } from './particles-background';
 
 const heroSlides = [
   {
-    headline: 'The Future of Learning, Powered by AI.',
+    headline: 'Unlock Your Potential with In-Demand IT Skills.',
     description:
-      'Supercharge your CS journey with an AI co-pilot for every course. Personalized, interactive, and always available.',
+      'Master Python, Web Development, Excel, and more with our expert-led, AI-supercharged courses. Your tech career starts here.',
     image: 'https://placehold.co/1200x800.png',
-    imageHint: 'futuristic education abstract',
+    imageHint: 'futuristic technology abstract',
     buttonLabel: 'Explore Courses',
     buttonLink: '/courses',
   },
   {
-    headline: 'Master In-Demand Skills with Expert-Led Courses.',
+    headline: 'From Beginner to Pro, We Have a Course for You.',
     description:
-      'From Python to Full-Stack Web Development, our curriculum is designed to make you a job-ready engineer.',
+      "Whether you're starting out or leveling up, find the perfect course to achieve your goals. Dive into hands-on projects and real-world scenarios.",
     image: 'https://placehold.co/1200x800.png',
     imageHint: 'code on screen',
     buttonLabel: 'Find Your Course',
     buttonLink: '/courses',
   },
   {
-    headline: 'Join a World-Class Team of Educators.',
+    headline: 'Share Your Expertise. Shape the Future.',
     description:
       'Are you an expert in your field? Create courses, inspire students, and earn revenue on our cutting-edge platform.',
     image: 'https://placehold.co/1200x800.png',
     imageHint: 'teacher online classroom',
     buttonLabel: 'Explore Careers',
-    buttonLink: '/trainers',
+    buttonLink: '/careers',
   },
 ];
 

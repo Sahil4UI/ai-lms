@@ -63,7 +63,7 @@ export default function Recommendations() {
             <Textarea
               id="learningHistory"
               name="learningHistory"
-              placeholder="e.g., 'Completed Intro to Python', 'Studied web development for 2 years'"
+              placeholder="e.g., 'Completed an intro to data analysis with Excel', 'Built a few small websites with HTML/CSS'"
               required
             />
           </div>
@@ -72,7 +72,7 @@ export default function Recommendations() {
             <Input
               id="preferences"
               name="preferences"
-              placeholder="e.g., 'Interested in AI and machine learning', 'Beginner difficulty'"
+              placeholder="e.g., 'Interested in mobile app development', 'Beginner difficulty Python courses'"
               required
             />
           </div>

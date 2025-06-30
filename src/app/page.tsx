@@ -21,21 +21,21 @@ import { HeroCarousel } from '@/components/hero-carousel';
 
 const testimonials = [
     {
-        quote: "This platform transformed my understanding of machine learning. The AI assistant is a game-changer for getting unstuck on complex topics.",
-        name: "Alex Johnson",
-        title: "Data Science Student",
+        quote: "The Web Development Bootcamp was incredible. I landed a new job before I even finished the course. The AI assistant helped me grasp complex concepts so much faster.",
+        name: "Jessica Miller",
+        title: "Full-Stack Developer",
         avatar: "https://placehold.co/100x100.png"
     },
     {
-        quote: "As a full-stack developer, I've seen many platforms, but none with the polish and AI integration of LearnAI. The Next.js course was top-notch.",
-        name: "Samantha Lee",
-        title: "Software Engineer",
+        quote: "I never thought I could learn Excel to this level. The course was practical and the instructor was amazing. It's already saved me hours of work each week.",
+        name: "David Rodriguez",
+        title: "Financial Analyst",
         avatar: "https://placehold.co/100x100.png"
     },
     {
-        quote: "I went from zero to building my own applications. The hands-on projects and instant feedback from the AI assistant made all the difference.",
-        name: "Michael Chen",
-        title: "Aspiring Developer",
+        quote: "The Python course took me from a complete beginner to writing my own scripts and applications. The platform is polished and the learning experience is top-notch.",
+        name: "Sarah Chen",
+        title: "Data Science Enthusiast",
         avatar: "https://placehold.co/100x100.png"
     }
 ]

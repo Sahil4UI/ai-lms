@@ -5,22 +5,28 @@ import { ArrowRight } from 'lucide-react';
 
 const openPositions = [
     {
-        title: 'Senior Python Instructor',
+        title: 'Python Instructor',
         department: 'Instruction',
         location: 'Remote',
-        description: 'Design and deliver world-class course content for advanced Python topics, including data science and web development.'
+        description: 'Design and deliver world-class course content for Python, from beginner to advanced topics.'
     },
     {
-        title: 'Lead Frontend Engineer (React/Next.js)',
-        department: 'Engineering',
-        location: 'Remote',
-        description: 'Drive the development of our learning platform, focusing on creating a beautiful, performant, and accessible user experience.'
-    },
-    {
-        title: 'Curriculum Developer - AI & Machine Learning',
+        title: 'Lead Web Development Instructor (React/Node.js)',
         department: 'Instruction',
         location: 'Remote',
-        description: 'Develop engaging and effective learning materials for our rapidly growing catalog of AI and Machine Learning courses.'
+        description: 'Create and lead our flagship web development curriculum, mentoring students to become job-ready developers.'
+    },
+    {
+        title: 'Microsoft Excel & VBA Expert',
+        department: 'Instruction',
+        location: 'Remote',
+        description: 'Develop engaging, practical learning materials for our popular Excel courses, covering advanced formulas, PivotTables, and VBA.'
+    },
+    {
+        title: 'Flutter & Dart Mobile Developer Instructor',
+        department: 'Instruction',
+        location: 'Remote',
+        description: 'Build and teach a comprehensive curriculum for building cross-platform mobile apps using Flutter and Dart.'
     }
 ]
 
