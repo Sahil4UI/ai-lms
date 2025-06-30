@@ -11,6 +11,7 @@ import {
   PlusCircle,
   Users,
   MoreHorizontal,
+  Banknote,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -38,17 +39,17 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { firestore } from '@/lib/firebase';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, orderBy, getDoc } from 'firebase/firestore';
 import { type Course } from '@/lib/data';
 
 export default function TrainerDashboardPage() {
   const { user, userData, loading } = useAuth();
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
+  const [stats, setStats] = useState({ totalStudents: 0, totalRevenue: 0 });
   const [isFetching, setIsFetching] = useState(true);
 
   useEffect(() => {
-    // Redirect if not logged in, or if user is not a trainer
     if (!loading && (!user || userData?.role !== 'trainer')) {
       router.push('/auth/login');
     }
@@ -56,7 +57,7 @@ export default function TrainerDashboardPage() {
 
   useEffect(() => {
     if (user && userData?.role === 'trainer') {
-      const fetchCourses = async () => {
+      const fetchCoursesAndStats = async () => {
         setIsFetching(true);
         const coursesCol = collection(firestore, 'courses');
         const q = query(
@@ -68,11 +69,18 @@ export default function TrainerDashboardPage() {
         const fetchedCourses = querySnapshot.docs.map(
           (doc) => ({ id: doc.id, ...doc.data() } as Course)
         );
+        
+        // Calculate stats
+        const totalStudents = fetchedCourses.reduce((sum, course) => sum + course.students, 0);
+        // Revenue calculation is a placeholder until a payment system is integrated
+        const totalRevenue = fetchedCourses.reduce((sum, course) => sum + (course.students * course.price), 0);
+
         setCourses(fetchedCourses);
+        setStats({ totalStudents, totalRevenue });
         setIsFetching(false);
       };
 
-      fetchCourses();
+      fetchCoursesAndStats();
     }
   }, [user, userData]);
 
@@ -86,16 +94,25 @@ export default function TrainerDashboardPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6 animate-in fade-in slide-in-from-bottom-8 duration-500">
-        <h1 className="font-headline text-3xl font-bold tracking-tight">
-          Trainer Dashboard
-        </h1>
-        <Button asChild>
-          <Link href="/trainers/courses/create">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Create New Course
-          </Link>
-        </Button>
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6 animate-in fade-in slide-in-from-bottom-8 duration-500">
+        <div className="space-y-1">
+            <h1 className="font-headline text-3xl font-bold tracking-tight">
+            Trainer Dashboard
+            </h1>
+            <p className="text-muted-foreground">Welcome back, {userData.displayName}!</p>
+        </div>
+        <div className="flex items-center gap-2">
+            <Button variant="outline" disabled>
+                <Banknote className="mr-2 h-4 w-4" />
+                Manage Payouts
+            </Button>
+            <Button asChild>
+            <Link href="/trainers/courses/create">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Create Course
+            </Link>
+            </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -105,9 +122,9 @@ export default function TrainerDashboardPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$0.00</div>
+            <div className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              Revenue tracking coming soon
+              Gross revenue from all courses
             </p>
           </CardContent>
         </Card>
@@ -119,7 +136,7 @@ export default function TrainerDashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">{stats.totalStudents.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
               Across all your courses
             </p>
@@ -180,11 +197,10 @@ export default function TrainerDashboardPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>Edit Course Details</DropdownMenuItem>
-                            <DropdownMenuItem>Manage Content</DropdownMenuItem>
-                            <DropdownMenuItem>Create Quiz</DropdownMenuItem>
+                            <DropdownMenuItem disabled>Edit Course</DropdownMenuItem>
+                            <DropdownMenuItem disabled>Manage Content</DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                            <DropdownMenuItem disabled className="text-destructive focus:text-destructive focus:bg-destructive/10">
                               Delete Course
                             </DropdownMenuItem>
                           </DropdownMenuContent>
