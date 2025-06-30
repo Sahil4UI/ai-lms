@@ -56,7 +56,6 @@ export function HeroCarousel() {
         <CarouselContent className="ml-0">
           {heroSlides.map((slide, index) => (
             <CarouselItem key={index} className="pl-0 relative">
-              <div className="absolute inset-0 bg-black/60 z-10" />
               <Image
                 src={slide.image}
                 width={1200}
@@ -66,7 +65,7 @@ export function HeroCarousel() {
                 className="w-full h-[60vh] lg:h-[80vh] object-cover"
                 priority={index === 0}
               />
-              <div key={index} className="container absolute inset-0 z-20 flex flex-col items-center justify-center text-center text-white space-y-4 px-4 md:px-6">
+              <div className="container absolute inset-0 z-20 flex flex-col items-center justify-center text-center text-white space-y-4 px-4 md:px-6 bg-gradient-to-t from-black/50 via-black/20 to-transparent pt-48 pb-20">
                 <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none animate-in fade-in-0 slide-in-from-bottom-12 duration-700">
                   {slide.headline}
                 </h1>

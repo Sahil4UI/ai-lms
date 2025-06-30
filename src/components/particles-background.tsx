@@ -70,10 +70,10 @@ export function ParticlesBackground() {
             enable: true,
             area: 800,
           },
-          value: 100,
+          value: 150,
         },
         opacity: {
-          value: 0.4,
+          value: 0.5,
         },
         shape: {
           type: 'circle',
@@ -93,7 +93,7 @@ export function ParticlesBackground() {
         id="tsparticles"
         particlesLoaded={particlesLoaded}
         options={options}
-        className="absolute inset-0 -z-10"
+        className="absolute inset-0 z-0"
       />
     );
   }
