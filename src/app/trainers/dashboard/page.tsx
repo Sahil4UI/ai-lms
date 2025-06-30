@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect } from 'react';
@@ -40,7 +39,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export default function TrainerDashboardPage() {
-  const { user, loading } = useAuth();
+  const { user, loading } from useAuth();
   const router = useRouter();
   const trainerCourses = courses.slice(0, 2);
 
