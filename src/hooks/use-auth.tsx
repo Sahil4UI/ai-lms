@@ -1,9 +1,8 @@
-
 'use client';
 
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, type User } from 'firebase/auth';
+import { onAuthStateChanged, type User, Unsubscribe } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { Preloader } from '@/components/preloader';
 import { auth, firestore } from '@/lib/firebase';
@@ -33,40 +32,50 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Always start loading
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
+    
     const unsubscribeAuth = onAuthStateChanged(auth, (authUser) => {
       setUser(authUser);
+      // If there is no user, we can stop loading.
       if (!authUser) {
-        // If there's no authenticated user, stop loading and clear data.
-        setUserData(null);
-        setTimeout(() => setLoading(false), 500); // Delay to prevent flash of content
+          setUserData(null);
+          setLoading(false);
       }
-      // If there is a user, the snapshot listener below will handle setting data and loading state.
     });
-
+    
     return () => unsubscribeAuth();
   }, []);
 
   useEffect(() => {
-    let unsubscribeSnapshot: () => void = () => {};
-
-    if (user) {
-      // If a user is authenticated, listen for changes to their document in Firestore.
-      const userDocRef = doc(firestore, 'users', user.uid);
-      unsubscribeSnapshot = onSnapshot(userDocRef, (userDoc) => {
-        if (userDoc.exists()) {
-          setUserData(userDoc.data() as UserData);
-        } else {
-          // This case can happen if a user exists in Auth but not in Firestore.
-          setUserData(null);
-        }
-        setTimeout(() => setLoading(false), 500); // Stop loading after data is fetched.
-      });
+    if (!user) {
+        // This case is handled by the onAuthStateChanged listener, which will set loading to false.
+        return;
     }
 
-    // Cleanup the snapshot listener when the user changes or component unmounts.
+    if (!firestore) {
+        setUserData(null);
+        setLoading(false);
+        return;
+    }
+
+    // When we have a user, but haven't fetched their data yet, we are loading.
+    setLoading(true);
+    const userDocRef = doc(firestore, 'users', user.uid);
+    const unsubscribeSnapshot = onSnapshot(userDocRef, (doc) => {
+        setUserData(doc.exists() ? (doc.data() as UserData) : null);
+        setLoading(false); // Stop loading once user data is fetched
+      }, (error) => {
+        console.error("Error fetching user data:", error);
+        setUserData(null);
+        setLoading(false); // Also stop loading on error
+      });
+
     return () => unsubscribeSnapshot();
   }, [user]);
 
