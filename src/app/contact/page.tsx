@@ -1,13 +1,66 @@
+'use client';
+
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { Loader2, Mail, MapPin, Phone } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { firestore } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function ContactPage() {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      toast({
+        title: 'Incomplete Form',
+        description: 'Please fill out all fields.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await addDoc(collection(firestore, 'contactSubmissions'), {
+        ...formData,
+        submittedAt: serverTimestamp(),
+      });
+      toast({
+        title: 'Message Sent!',
+        description: "Thanks for reaching out. We'll get back to you soon.",
+      });
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      toast({
+        title: 'Submission Failed',
+        description: 'Something went wrong. Please try again later.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="bg-background">
+    <div className="bg-transparent">
       <section className="w-full py-12 md:py-24 lg:py-32">
         <div className="container px-4 md:px-6">
           <div className="mx-auto max-w-3xl text-center space-y-4 animate-in fade-in slide-in-from-bottom-8 duration-500">
@@ -32,11 +85,11 @@ export default function ContactPage() {
                   <CardTitle>Send us a Message</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <form className="space-y-4">
+                  <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div className="space-y-2">
                         <Label htmlFor="name">Name</Label>
-                        <Input id="name" placeholder="Enter your name" />
+                        <Input id="name" placeholder="Enter your name" value={formData.name} onChange={handleChange} />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="email">Email</Label>
@@ -44,12 +97,13 @@ export default function ContactPage() {
                           id="email"
                           type="email"
                           placeholder="Enter your email"
+                          value={formData.email} onChange={handleChange}
                         />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="subject">Subject</Label>
-                      <Input id="subject" placeholder="Enter the subject" />
+                      <Input id="subject" placeholder="Enter the subject" value={formData.subject} onChange={handleChange} />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="message">Message</Label>
@@ -57,9 +111,11 @@ export default function ContactPage() {
                         id="message"
                         placeholder="Enter your message"
                         className="min-h-[120px]"
+                        value={formData.message} onChange={handleChange}
                       />
                     </div>
-                    <Button type="submit" className="w-full">
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                       Send Message
                     </Button>
                   </form>
