@@ -56,7 +56,7 @@ export default function Home() {
               <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
                 Next-Gen Features
               </div>
-              <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl animate-in fade-in slide-in-from-bottom-8 duration-700">
+              <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl animate-in fade-in slide-in-from-bottom-8 duration-700 bg-gradient-to-br from-slate-200 to-slate-500 bg-clip-text text-transparent">
                 Smarter Learning, Powered by AI
               </h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed animate-in fade-in slide-in-from-bottom-12 duration-900">
@@ -91,11 +91,11 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="courses" className="w-full py-12 md:py-24 lg:py-32 bg-muted/30">
+      <section id="courses" className="w-full py-12 md:py-24 lg:py-32 bg-black/10">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <div className="space-y-2">
-              <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl">
+              <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl bg-gradient-to-br from-slate-200 to-slate-500 bg-clip-text text-transparent">
                 Featured Courses
               </h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -134,7 +134,7 @@ export default function Home() {
       <section id="testimonials" className="w-full py-12 md:py-24 lg:py-32">
         <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-                <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl">
+                <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl bg-gradient-to-br from-slate-200 to-slate-500 bg-clip-text text-transparent">
                     Loved by Learners Worldwide
                 </h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -143,7 +143,7 @@ export default function Home() {
             </div>
             <div className="mx-auto grid max-w-5xl items-stretch gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {testimonials.map((testimonial, index) => (
-                     <Card key={index} className="h-full flex flex-col bg-muted/40 border-border/60 animate-in fade-in slide-in-from-bottom-12 duration-500 ease-in-out" style={{ animationDelay: `${index * 150}ms`}}>
+                     <Card key={index} className="h-full flex flex-col animate-in fade-in slide-in-from-bottom-12 duration-500 ease-in-out" style={{ animationDelay: `${index * 150}ms`}}>
                         <CardContent className="p-6 flex flex-col flex-grow">
                             <Quote className="h-8 w-8 text-primary mb-4" />
                             <p className="text-muted-foreground mb-6 flex-grow">{testimonial.quote}</p>
@@ -167,7 +167,7 @@ export default function Home() {
       <section className="w-full py-12 md:py-24 lg:py-32">
         <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 animate-in fade-in duration-500">
           <div className="space-y-3">
-            <h2 className="font-headline text-3xl font-bold tracking-tighter md:text-4xl/tight">
+            <h2 className="font-headline text-3xl font-bold tracking-tighter md:text-4xl/tight bg-gradient-to-br from-slate-200 to-slate-500 bg-clip-text text-transparent">
               Join Our Mission
             </h2>
             <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -177,7 +177,7 @@ export default function Home() {
           </div>
           <div className="mx-auto w-full max-w-sm space-y-2">
             <Button asChild size="lg" className="w-full">
-              <Link href="/trainers">Explore Careers</Link>
+              <Link href="/careers">Explore Careers</Link>
             </Button>
           </div>
         </div>

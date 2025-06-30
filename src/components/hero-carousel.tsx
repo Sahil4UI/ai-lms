@@ -62,14 +62,14 @@ export function HeroCarousel() {
                 height={800}
                 alt={slide.headline}
                 data-ai-hint={slide.imageHint}
-                className="w-full h-[60vh] lg:h-[80vh] object-cover"
+                className="w-full h-[60vh] lg:h-[80vh] object-cover opacity-20"
                 priority={index === 0}
               />
-              <div className="container absolute inset-0 z-20 flex flex-col items-center justify-center text-center text-white space-y-4 px-4 md:px-6 bg-gradient-to-t from-black/50 via-black/20 to-transparent pt-48 pb-20">
-                <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none animate-in fade-in-0 slide-in-from-bottom-12 duration-700">
+              <div className="container absolute inset-0 z-20 flex flex-col items-center justify-center text-center text-white space-y-6 px-4 md:px-6 bg-gradient-to-t from-background/50 via-background/20 to-transparent pt-48 pb-20">
+                <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none animate-in fade-in-0 slide-in-from-bottom-12 duration-700 bg-gradient-to-br from-white via-slate-300 to-primary bg-clip-text text-transparent">
                   {slide.headline}
                 </h1>
-                <p className="max-w-[700px] text-lg md:text-xl animate-in fade-in-0 slide-in-from-bottom-10 duration-1000">
+                <p className="max-w-[700px] text-lg text-slate-300 md:text-xl animate-in fade-in-0 slide-in-from-bottom-10 duration-1000">
                   {slide.description}
                 </p>
                 <Button asChild size="lg" className="group mt-4 animate-in fade-in-0 slide-in-from-bottom-8 duration-1200">

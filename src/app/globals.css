@@ -4,48 +4,36 @@
 
 @layer base {
   :root {
-    --background: 220 100% 97%;
-    --foreground: 240 10% 3.9%;
-    --card: 240 60% 100% / 0.5;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 220 100% 97%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 260 85% 60%;
-    --primary-foreground: 260 40% 98%;
-    --secondary: 240 10% 95%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 10% 95%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 260 100% 96%;
-    --accent-foreground: 260 80% 50%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 240 10% 3.9% / 0.05;
-    --input: 240 10% 3.9% / 0.05;
-    --ring: 260 85% 60%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 260 40% 8%;
-    --foreground: 210 40% 98%;
-    --card: 260 20% 10% / 0.5;
+    --background: 260 40% 8%; /* Dark deep blue/violet */
+    --foreground: 210 40% 98%; /* Almost white */
+    
+    --card: 260 20% 12% / 0.6; /* Semi-transparent dark card */
     --card-foreground: 210 40% 98%;
+    
     --popover: 260 40% 8%;
     --popover-foreground: 210 40% 98%;
-    --primary: 260 95% 75%;
-    --primary-foreground: 260 50% 10%;
-    --secondary: 260 20% 15% / 0.7;
+
+    --primary: 280 95% 75%; /* Vibrant magenta/violet */
+    --primary-foreground: 280 50% 10%; /* Dark text on primary */
+    
+    --secondary: 260 20% 18%; /* Darker secondary */
     --secondary-foreground: 210 40% 98%;
-    --muted: 260 20% 15% / 0.7;
+    
+    --muted: 260 20% 18%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 260 30% 18%;
-    --accent-foreground: 260 95% 85%;
-    --destructive: 0 62.8% 30.6%;
+    
+    --accent: 300 90% 70%; /* Bright pink accent for hovers */
+    --accent-foreground: 300 50% 10%;
+    
+    --destructive: 0 72.2% 50.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 210 40% 98% / 0.05;
-    --input: 210 40% 98% / 0.05;
-    --ring: 260 95% 75%;
+    
+    --border: 210 40% 98% / 0.1; /* Glowing border effect */
+    --input: 210 40% 98% / 0.1; /* Glowing input effect */
+    --ring: 280 95% 75%; /* Ring color matches primary */
+    
+    --radius: 0.75rem;
+
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -60,12 +48,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image: linear-gradient(135deg, hsl(230, 40%, 10%), hsl(280, 35%, 12%));
     background-attachment: fixed;
-  }
-  :root {
-      background-image: linear-gradient(to bottom right, hsl(220, 100%, 94%), hsl(260, 100%, 94%));
-  }
-  .dark {
-      background-image: linear-gradient(to bottom right, hsl(220, 40%, 10%), hsl(260, 40%, 10%));
   }
 }

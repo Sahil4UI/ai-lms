@@ -49,7 +49,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="w-full border-t bg-card/80 backdrop-blur-lg">
+    <footer className="w-full border-t border-white/10 bg-black/20 backdrop-blur-lg">
       <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="flex flex-col gap-4">
@@ -86,7 +86,7 @@ export function Footer() {
 
             <div className="flex flex-col gap-3">
                 <h4 className="font-semibold">Company</h4>
-                <Link href="/trainers" className="text-sm text-muted-foreground hover:text-primary">Careers</Link>
+                <Link href="/careers" className="text-sm text-muted-foreground hover:text-primary">Careers</Link>
                 <Link href="/contact" className="text-sm text-muted-foreground hover:text-primary">Contact Us</Link>
                  <Link href="#" className="text-sm text-muted-foreground hover:text-primary">Blog</Link>
             </div>

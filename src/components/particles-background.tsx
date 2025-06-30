@@ -2,13 +2,11 @@
 
 import type { Container, ISourceOptions } from '@tsparticles/engine';
 import Particles, { initParticlesEngine } from '@tsparticles/react';
-import { useTheme } from 'next-themes';
 import { useEffect, useMemo, useState } from 'react';
 import { loadSlim } from '@tsparticles/slim';
 
 export function ParticlesBackground() {
   const [init, setInit] = useState(false);
-  const { theme } = useTheme();
 
   useEffect(() => {
     initParticlesEngine(async (engine) => {
@@ -46,13 +44,13 @@ export function ParticlesBackground() {
       },
       particles: {
         color: {
-          value: theme === 'dark' ? '#ffffff' : '#4f46e5',
+          value: '#ffffff',
         },
         links: {
-          color: theme === 'dark' ? '#ffffff' : '#4f46e5',
+          color: '#ffffff',
           distance: 150,
           enable: true,
-          opacity: 0.3,
+          opacity: 0.1,
           width: 1,
         },
         move: {
@@ -62,7 +60,7 @@ export function ParticlesBackground() {
             default: 'out',
           },
           random: false,
-          speed: 1.5,
+          speed: 1,
           straight: false,
         },
         number: {
@@ -70,21 +68,21 @@ export function ParticlesBackground() {
             enable: true,
             area: 800,
           },
-          value: 150,
+          value: 120,
         },
         opacity: {
-          value: 0.5,
+          value: 0.2,
         },
         shape: {
           type: 'circle',
         },
         size: {
-          value: { min: 1, max: 3 },
+          value: { min: 1, max: 2 },
         },
       },
       detectRetina: true,
     }),
-    [theme]
+    []
   );
 
   if (init) {
