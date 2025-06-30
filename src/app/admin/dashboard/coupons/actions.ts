@@ -12,6 +12,8 @@ const couponSchema = z.object({
 });
 
 export async function addCoupon(prevState: any, formData: FormData) {
+  if (!firestore) return { error: 'Firebase is not configured.' };
+  
   const data = Object.fromEntries(formData.entries());
   
   const validated = couponSchema.safeParse(data);
@@ -36,6 +38,8 @@ export async function addCoupon(prevState: any, formData: FormData) {
 }
 
 export async function updateCoupon(id: string, prevState: any, formData: FormData) {
+  if (!firestore) return { error: 'Firebase is not configured.' };
+
   const data = Object.fromEntries(formData.entries());
   const validated = couponSchema.safeParse(data);
 
@@ -54,6 +58,7 @@ export async function updateCoupon(id: string, prevState: any, formData: FormDat
 }
 
 export async function deleteCoupon(id: string) {
+  if (!firestore) return { error: 'Firebase is not configured.' };
   try {
     const docRef = doc(firestore, 'coupons', id);
     await deleteDoc(docRef);

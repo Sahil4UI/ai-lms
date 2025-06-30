@@ -14,6 +14,8 @@ const testimonialSchema = z.object({
 });
 
 export async function addTestimonial(prevState: any, formData: FormData) {
+  if (!firestore) return { error: 'Firebase is not configured.' };
+
   const data = Object.fromEntries(formData.entries());
   
   const validated = testimonialSchema.safeParse(data);
@@ -33,6 +35,8 @@ export async function addTestimonial(prevState: any, formData: FormData) {
 }
 
 export async function updateTestimonial(id: string, prevState: any, formData: FormData) {
+  if (!firestore) return { error: 'Firebase is not configured.' };
+
   const data = Object.fromEntries(formData.entries());
 
   const validated = testimonialSchema.safeParse(data);
@@ -53,6 +57,8 @@ export async function updateTestimonial(id: string, prevState: any, formData: Fo
 }
 
 export async function deleteTestimonial(id: string) {
+  if (!firestore) return { error: 'Firebase is not configured.' };
+
   try {
     const docRef = doc(firestore, 'testimonials', id);
     await deleteDoc(docRef);
@@ -66,12 +72,13 @@ export async function deleteTestimonial(id: string) {
 
 // Seed initial data if collection is empty
 export async function seedTestimonials(testimonials: Omit<Testimonial, 'id'>[]) {
-    const testimonialsCol = collection(firestore, 'testimonials');
-    const snapshot = await getDocs(testimonialsCol);
-    if (snapshot.empty) {
-        for (const testimonial of testimonials) {
-            await addDoc(testimonialsCol, testimonial);
-        }
-        revalidatePath('/');
-    }
+  if (!firestore) return; // Add this guard
+  const testimonialsCol = collection(firestore, 'testimonials');
+  const snapshot = await getDocs(testimonialsCol);
+  if (snapshot.empty) {
+      for (const testimonial of testimonials) {
+          await addDoc(testimonialsCol, testimonial);
+      }
+      revalidatePath('/');
+  }
 }

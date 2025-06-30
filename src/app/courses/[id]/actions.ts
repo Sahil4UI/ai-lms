@@ -17,6 +17,8 @@ import {
 import { revalidatePath } from 'next/cache';
 
 export async function applyCoupon(code: string) {
+  if (!firestore) return { error: 'Firebase is not configured.' };
+
   if (!code) {
     return { error: 'Please enter a coupon code.' };
   }
@@ -44,6 +46,8 @@ export async function applyCoupon(code: string) {
 
 
 export async function enrollInCourse(courseId: string, userId: string, couponCode?: string) {
+    if (!firestore) return { error: 'Firebase is not configured.' };
+
     if (!userId) {
         return { error: 'You must be logged in to enroll.' };
     }

@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Image from 'next/image';
@@ -39,6 +40,13 @@ import type { Metadata } from 'next';
 
 // This function generates dynamic metadata for each course page
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  if (!firestore) {
+    return {
+      title: 'Course',
+      description: 'View course details.'
+    }
+  }
+
   const courseRef = doc(firestore, 'courses', params.id);
   const courseSnap = await getDoc(courseRef);
 
@@ -90,6 +98,12 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
 
   useEffect(() => {
     const fetchCourse = async () => {
+      if (!firestore) {
+        setLoading(false);
+        toast({ title: "Error", description: "Cannot load course, Firebase not configured.", variant: "destructive"});
+        return;
+      }
+
       const courseRef = doc(firestore, 'courses', params.id);
       const courseSnap = await getDoc(courseRef);
 
@@ -104,14 +118,21 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
     };
 
     fetchCourse();
-  }, [params.id]);
+  }, [params.id, toast]);
 
   if (loading) {
     return <div className="flex h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>;
   }
   
   if (!course) {
-      return notFound();
+      return (
+        <div className="flex h-screen items-center justify-center">
+            <div className="text-center">
+                <h1 className="text-2xl font-bold">Course Not Found</h1>
+                <p className="text-muted-foreground">This may be due to a configuration issue.</p>
+            </div>
+        </div>
+      );
   }
 
   const handleApplyCoupon = async () => {

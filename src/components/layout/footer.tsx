@@ -17,6 +17,14 @@ export function Footer() {
 
   const handleNewsletterSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!firestore) {
+      toast({
+        title: 'Service Unavailable',
+        description: 'The newsletter service is not configured. Please try again later.',
+        variant: 'destructive',
+      });
+      return;
+    }
     if (!email) {
       toast({
         title: 'Email Required',

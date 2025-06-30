@@ -28,6 +28,14 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!firestore) {
+        toast({
+            title: 'Service Unavailable',
+            description: 'The contact form service is not configured. Please try again later.',
+            variant: 'destructive',
+        });
+        return;
+    }
     if (!formData.name || !formData.email || !formData.subject || !formData.message) {
       toast({
         title: 'Incomplete Form',

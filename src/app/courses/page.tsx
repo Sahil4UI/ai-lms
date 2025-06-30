@@ -12,10 +12,23 @@ export const metadata: Metadata = {
 };
 
 export default async function CoursesPage() {
-  const coursesCol = collection(firestore, 'courses');
-  const q = query(coursesCol, orderBy('createdAt', 'desc'));
-  const coursesSnapshot = await getDocs(q);
-  const courses: Course[] = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+  let courses: Course[] = [];
+  let error = null;
+
+  if (firestore) {
+    try {
+      const coursesCol = collection(firestore, 'courses');
+      const q = query(coursesCol, orderBy('createdAt', 'desc'));
+      const coursesSnapshot = await getDocs(q);
+      courses = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+    } catch (e) {
+      console.error("Failed to fetch courses:", e);
+      error = "Could not load courses at this time.";
+    }
+  } else {
+    error = "Firebase is not configured. Courses cannot be displayed.";
+  }
+  
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -34,7 +47,9 @@ export default async function CoursesPage() {
           <Input placeholder="Search for courses..." className="pl-10" />
         </div>
       </div>
-      {courses.length > 0 ? (
+      {error ? (
+        <p className="text-center text-destructive mt-12">{error}</p>
+      ) : courses.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 animate-in fade-in slide-in-from-bottom-8 duration-900">
           {courses.map((course) => (
             <CourseCard key={course.id} course={course} />

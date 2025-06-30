@@ -48,20 +48,31 @@ const placeholderTestimonials: Omit<Testimonial, 'id'>[] = [
 async function getHomePageData() {
   noStore(); // Ensures data is fetched on every request
 
-  // Fetch Courses
-  const coursesCol = collection(firestore, 'courses');
-  const coursesQuery = query(coursesCol, orderBy('createdAt', 'desc'), limit(6));
-  const coursesSnapshot = await getDocs(coursesQuery);
-  const featuredCourses: Course[] = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+  // If firestore is not initialized, return empty/placeholder data to prevent crash
+  if (!firestore) {
+    console.warn("Firestore is not initialized. Skipping data fetching for homepage.");
+    return { featuredCourses: [], testimonials: placeholderTestimonials };
+  }
 
-  // Fetch Testimonials
-  const testimonialsCol = collection(firestore, 'testimonials');
-  // Seed initial data if the collection is empty. This helps with first-run experience.
-  await seedTestimonials(placeholderTestimonials);
-  const testimonialsSnapshot = await getDocs(query(testimonialsCol));
-  const testimonials: Testimonial[] = testimonialsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
+  try {
+    // Fetch Courses
+    const coursesCol = collection(firestore, 'courses');
+    const coursesQuery = query(coursesCol, orderBy('createdAt', 'desc'), limit(6));
+    const coursesSnapshot = await getDocs(coursesQuery);
+    const featuredCourses: Course[] = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
 
-  return { featuredCourses, testimonials };
+    // Fetch Testimonials
+    await seedTestimonials(placeholderTestimonials);
+    const testimonialsCol = collection(firestore, 'testimonials');
+    const testimonialsSnapshot = await getDocs(query(testimonialsCol));
+    const testimonials: Testimonial[] = testimonialsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
+
+    return { featuredCourses, testimonials };
+  } catch (error) {
+    console.error("Homepage data fetching error:", error);
+    // In case of error (e.g., permissions), return placeholder data
+    return { featuredCourses: [], testimonials: placeholderTestimonials };
+  }
 }
 
 
