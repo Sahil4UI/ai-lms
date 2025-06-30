@@ -61,7 +61,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     // This effect sets up the invisible reCAPTCHA verifier for phone auth.
-    if (view === 'phone' && !recaptchaVerifierRef.current) {
+    if (view === 'phone' && auth && !recaptchaVerifierRef.current) {
       recaptchaVerifierRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
         'size': 'invisible',
         'callback': (response: any) => {},
@@ -73,6 +73,7 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
+    if (!auth) return;
     try {
       await signInWithEmailAndPassword(auth, data.email, data.password);
       router.push('/dashboard');
@@ -88,6 +89,7 @@ export default function LoginPage() {
   };
 
   const handleUserCreationInDb = async (user: any) => {
+    if (!firestore) return;
     const userRef = doc(firestore, 'users', user.uid);
     const userDoc = await getDoc(userRef);
     if (!userDoc.exists()) {
@@ -105,6 +107,7 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     setIsLoading(true);
+    if (!auth) return;
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
@@ -122,6 +125,7 @@ export default function LoginPage() {
   };
 
   const handleSendOtp = async () => {
+    if (!auth) return;
     if (!phone.startsWith('+')) {
       toast({
         title: 'Invalid Phone Number',
@@ -235,12 +239,6 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
-                <Link
-                  href="#"
-                  className="ml-auto inline-block text-sm underline"
-                >
-                  Forgot your password?
-                </Link>
               </div>
               <Input id="password" type="password" {...register('password')} disabled={isLoading} />
               {errors.password && (

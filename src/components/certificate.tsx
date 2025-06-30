@@ -9,9 +9,10 @@ type CertificateProps = {
 };
 
 export function Certificate({ studentName, courseTitle }: CertificateProps) {
-  const [currentDate, setCurrentDate] = useState('');
+  const [currentDate, setCurrentDate] = useState<string | null>(null);
 
   useEffect(() => {
+    // This ensures the date is only generated on the client, avoiding hydration mismatches.
     setCurrentDate(new Date().toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -42,7 +43,7 @@ export function Certificate({ studentName, courseTitle }: CertificateProps) {
           {studentName}
         </p>
         <p className="text-lg text-muted-foreground">
-          for successfully completing the course on {currentDate}.
+          {currentDate ? `for successfully completing the course on ${currentDate}.` : '...'}
         </p>
         <div className="mt-12 flex justify-between items-end w-full max-w-md mx-auto">
             <div className="text-center">

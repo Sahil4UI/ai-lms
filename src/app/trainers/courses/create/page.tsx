@@ -21,14 +21,14 @@ import { useEffect, useState } from 'react';
 import { Progress } from '@/components/ui/progress';
 import type { Metadata } from 'next';
 
-// export const metadata: Metadata = {
-//   title: 'Create Course',
-//   description: 'Build and launch your new course on LearnAI.',
-//   robots: {
-//     index: false,
-//     follow: false,
-//   }
-// };
+export const metadata: Metadata = {
+  title: 'Create Course',
+  description: 'Build and launch your new course on LearnAI.',
+  robots: {
+    index: false,
+    follow: false,
+  }
+};
 
 
 const lectureSchema = z.object({
@@ -54,6 +54,7 @@ type CourseFormValues = z.infer<typeof courseSchema>;
 // A separate backend service (e.g., a Firebase Cloud Function) should listen to this collection
 // to actually process and send the emails using a service like SendGrid or Mailgun.
 async function triggerNewCourseNotification(courseId: string, courseTitle: string) {
+  if (!firestore) return;
   try {
     const usersCollection = collection(firestore, 'users');
     const q = query(usersCollection, where('role', '==', 'student'));
@@ -125,8 +126,8 @@ export default function CreateCoursePage() {
   };
 
   const onSubmit = async (data: CourseFormValues) => {
-    if (!user || !userData) {
-        toast({ title: 'Authentication Error', description: 'Could not verify user.', variant: 'destructive' });
+    if (!user || !userData || !firestore || !storage) {
+        toast({ title: 'Authentication Error', description: 'Could not verify user or Firebase services.', variant: 'destructive' });
         return;
     }
 

@@ -1,3 +1,4 @@
+
 import { getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
 import { getFirestore, type Firestore } from 'firebase/firestore';
@@ -14,31 +15,13 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-let app: FirebaseApp;
-let auth: Auth;
-let firestore: Firestore;
-let storage: FirebaseStorage;
-let analytics: Promise<Analytics | null>;
-
-// Conditionally initialize Firebase only if the API key is provided
-if (firebaseConfig.apiKey) {
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  auth = getAuth(app);
-  firestore = getFirestore(app);
-  storage = getStorage(app);
-  analytics = isSupported().then(yes => (yes ? getAnalytics(app) : null));
-} else {
-    // This is a fallback for when the environment variables are not set.
-    // This will prevent the app from crashing, but Firebase features will not work.
-    console.warn("Firebase config is missing. Firebase features will be disabled. Please set up your .env file as instructed in README.md");
-
-    // Provide mock/dummy objects to avoid crashing the app on import
-    app = {} as FirebaseApp;
-    auth = {} as Auth;
-    firestore = {} as Firestore;
-    storage = {} as FirebaseStorage;
-    analytics = Promise.resolve(null);
-}
+// Initialize Firebase.
+// This will throw a clear error if the environment variables are not set, which is the desired behavior.
+const app: FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const auth: Auth = getAuth(app);
+const firestore: Firestore = getFirestore(app);
+const storage: FirebaseStorage = getStorage(app);
+const analytics: Promise<Analytics | null> = isSupported().then(yes => (yes ? getAnalytics(app) : null));
 
 
 export { app, auth, firestore, storage, analytics };
