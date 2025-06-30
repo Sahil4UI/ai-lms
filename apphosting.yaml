@@ -1,6 +1,16 @@
 # Settings to manage and configure a Firebase App Hosting backend.
 # https://firebase.google.com/docs/app-hosting/configure
 
+# The ID of your App Hosting backend.
+# This is the ID you'll use to manage your backend, for example, when deploying.
+backendId: learnai-backend
+
+# The Google Cloud project that the backend is hosted in.
+projectId: ai-lms-2100f
+
+# The Google Cloud region that the backend is hosted in.
+location: us-central1
+
 runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
