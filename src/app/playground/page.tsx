@@ -26,7 +26,7 @@ greet("Learner");
   return (
     <div className="container mx-auto px-4 py-8">
       <header className="mb-8 text-center animate-in fade-in slide-in-from-bottom-8 duration-500">
-        <h1 className="font-headline text-4xl font-bold tracking-tight lg:text-5xl">
+        <h1 className="font-headline text-4xl font-bold tracking-tight lg:text-5xl bg-gradient-to-br from-primary via-slate-400 to-accent bg-clip-text text-transparent">
           Code Playground
         </h1>
         <p className="mt-2 text-lg text-muted-foreground">
@@ -40,13 +40,16 @@ greet("Learner");
             <CardTitle>My Scratchpad</CardTitle>
             <div className="flex items-center gap-2">
               <Select defaultValue="javascript">
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select language" />
+                <SelectTrigger className="w-[240px]">
+                  <SelectValue placeholder="Select Environment" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="javascript">JavaScript</SelectItem>
-                  <SelectItem value="python">Python (coming soon)</SelectItem>
-                  <SelectItem value="html">HTML/CSS (coming soon)</SelectItem>
+                  <SelectItem value="python" disabled>Python (coming soon)</SelectItem>
+                  <SelectItem value="html" disabled>HTML/CSS (coming soon)</SelectItem>
+                  <SelectItem value="flutter" disabled>Flutter (coming soon)</SelectItem>
+                  <SelectItem value="excel" disabled>Excel Simulator (coming soon)</SelectItem>
+                  <SelectItem value="mysql" disabled>MySQL (coming soon)</SelectItem>
                 </SelectContent>
               </Select>
               <Button>
