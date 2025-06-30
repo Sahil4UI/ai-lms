@@ -7,8 +7,6 @@ import { Book, LayoutDashboard, TestTube2, Users, TicketPercent } from 'lucide-r
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { logout } from '../actions';
-import { getSession } from '../actions';
-import { redirect } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const navItems = [
@@ -28,21 +26,16 @@ export default function AdminDashboardLayout({
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // This check ensures the session logic runs only on the client-side
-    // after initial render, preventing hydration mismatches and server-side redirects
-    // which are now handled by the middleware.
-    setIsClient(true); 
-    const checkSession = async () => {
-        const session = await getSession();
-        if (!session.isLoggedIn) {
-            redirect('/admin/login');
-        }
-    };
-    checkSession();
+    // This effect ensures we are on the client-side before rendering the full component.
+    // This avoids potential hydration mismatches with hooks like usePathname.
+    // The actual session protection is handled by the middleware.
+    setIsClient(true);
   }, []);
 
   if (!isClient) {
-      return null; // or a loading spinner
+    // Render nothing or a loading spinner on the server and initial client render
+    // to prevent hydration mismatch.
+    return null;
   }
 
   return (
