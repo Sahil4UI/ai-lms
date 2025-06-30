@@ -147,7 +147,7 @@ export default function Home() {
                         <CardContent className="p-6 flex flex-col flex-grow">
                             <Quote className="h-8 w-8 text-primary mb-4" />
                             <p className="text-muted-foreground mb-6 flex-grow">{testimonial.quote}</p>
-                            <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-4 mt-auto">
                                 <Avatar>
                                     <AvatarImage src={testimonial.avatar} alt={testimonial.name} data-ai-hint="person face"/>
                                     <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
@@ -168,17 +168,16 @@ export default function Home() {
         <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 animate-in fade-in duration-500">
           <div className="space-y-3">
             <h2 className="font-headline text-3xl font-bold tracking-tighter md:text-4xl/tight">
-              Share Your Knowledge
+              Join Our Mission
             </h2>
             <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Are you an expert in your field? Join our platform as a trainer,
-              create courses, and earn revenue while shaping the next generation
-              of tech talent.
+              Are you an expert in your field? Join our platform as an instructor or engineer,
+              and help us shape the next generation of tech talent.
             </p>
           </div>
           <div className="mx-auto w-full max-w-sm space-y-2">
             <Button asChild size="lg" className="w-full">
-              <Link href="/trainers">Become a Trainer</Link>
+              <Link href="/trainers">Explore Careers</Link>
             </Button>
           </div>
         </div>

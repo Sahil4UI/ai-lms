@@ -34,12 +34,12 @@ const heroSlides = [
     buttonLink: '/courses',
   },
   {
-    headline: 'Become a Trainer. Share Your Knowledge.',
+    headline: 'Join a World-Class Team of Educators.',
     description:
-      'Join our platform as a trainer, create world-class courses, and earn revenue while shaping the next generation of tech talent.',
+      'Are you an expert in your field? Create courses, inspire students, and earn revenue on our cutting-edge platform.',
     image: 'https://placehold.co/1200x800.png',
     imageHint: 'teacher online classroom',
-    buttonLabel: 'Get Started',
+    buttonLabel: 'Explore Careers',
     buttonLink: '/trainers',
   },
 ];

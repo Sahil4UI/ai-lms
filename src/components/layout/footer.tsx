@@ -86,8 +86,7 @@ export function Footer() {
 
             <div className="flex flex-col gap-3">
                 <h4 className="font-semibold">Company</h4>
-                <Link href="/careers" className="text-sm text-muted-foreground hover:text-primary">Careers</Link>
-                <Link href="/trainers" className="text-sm text-muted-foreground hover:text-primary">For Trainers</Link>
+                <Link href="/trainers" className="text-sm text-muted-foreground hover:text-primary">Careers</Link>
                 <Link href="/contact" className="text-sm text-muted-foreground hover:text-primary">Contact Us</Link>
                  <Link href="#" className="text-sm text-muted-foreground hover:text-primary">Blog</Link>
             </div>

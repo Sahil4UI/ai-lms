@@ -45,7 +45,7 @@ export function Header() {
               href="/trainers"
               className="transition-colors hover:text-foreground/80 text-foreground/60"
             >
-              For Trainers
+              Careers
             </Link>
             <Link
               href="/contact"
