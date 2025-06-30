@@ -4,14 +4,46 @@ import {
   ArrowRight,
   BookOpen,
   Cpu,
+  Quote,
   Rocket,
+  Star,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CourseCard } from '@/components/course-card';
 import { courses } from '@/lib/data';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+import { Card, CardContent } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
+const testimonials = [
+    {
+        quote: "This platform transformed my understanding of machine learning. The AI assistant is a game-changer for getting unstuck on complex topics.",
+        name: "Alex Johnson",
+        title: "Data Science Student",
+        avatar: "https://placehold.co/40x40.png"
+    },
+    {
+        quote: "As a full-stack developer, I've seen many platforms, but none with the polish and AI integration of LearnAI. The Next.js course was top-notch.",
+        name: "Samantha Lee",
+        title: "Software Engineer",
+        avatar: "https://placehold.co/40x40.png"
+    },
+    {
+        quote: "I went from zero to building my own applications. The hands-on projects and instant feedback from the AI assistant made all the difference.",
+        name: "Michael Chen",
+        title: "Aspiring Developer",
+        avatar: "https://placehold.co/40x40.png"
+    }
+]
 
 export default function Home() {
-  const featuredCourses = courses.slice(0, 3);
+  const featuredCourses = courses.slice(0, 4);
 
   return (
     <div className="flex flex-col min-h-[100dvh]">
@@ -93,9 +125,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="courses" className="w-full py-12 md:py-24 lg:py-32 bg-muted/20">
+      <section id="courses" className="w-full py-12 md:py-24 lg:py-32 bg-muted/30">
         <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <div className="space-y-2">
               <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl">
                 Featured Courses
@@ -106,16 +138,63 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="mx-auto grid grid-cols-1 gap-6 py-12 sm:grid-cols-2 lg:grid-cols-3">
-            {featuredCourses.map((course) => (
-              <CourseCard key={course.id} course={course} />
-            ))}
-          </div>
-          <div className="flex justify-center">
+          <Carousel
+            opts={{
+              align: 'start',
+              loop: true,
+            }}
+            className="w-full max-w-6xl mx-auto"
+          >
+            <CarouselContent>
+              {featuredCourses.map((course) => (
+                <CarouselItem key={course.id} className="md:basis-1/2 lg:basis-1/3">
+                  <div className="p-1 h-full">
+                    <CourseCard course={course} />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden sm:flex" />
+            <CarouselNext className="hidden sm:flex" />
+          </Carousel>
+          <div className="mt-12 flex justify-center">
             <Button asChild size="lg">
               <Link href="/courses">View All Courses</Link>
             </Button>
           </div>
+        </div>
+      </section>
+
+      <section id="testimonials" className="w-full py-12 md:py-24 lg:py-32">
+        <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+                <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl">
+                    Loved by Learners Worldwide
+                </h2>
+                <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                    See what our students have to say about their learning experience.
+                </p>
+            </div>
+            <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                {testimonials.map((testimonial, index) => (
+                     <Card key={index} className="bg-muted/40 border-border/60">
+                        <CardContent className="p-6">
+                            <Quote className="h-8 w-8 text-primary mb-4" />
+                            <p className="text-muted-foreground mb-6">{testimonial.quote}</p>
+                            <div className="flex items-center gap-4">
+                                <Avatar>
+                                    <AvatarImage src={testimonial.avatar} alt={testimonial.name} data-ai-hint="person face"/>
+                                    <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p className="font-semibold">{testimonial.name}</p>
+                                    <p className="text-sm text-muted-foreground">{testimonial.title}</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+            </div>
         </div>
       </section>
 
