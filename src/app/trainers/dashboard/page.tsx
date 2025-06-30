@@ -39,7 +39,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export default function TrainerDashboardPage() {
-  const { user, loading } from useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const trainerCourses = courses.slice(0, 2);
 
