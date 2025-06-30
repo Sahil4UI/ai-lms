@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CourseCard } from '@/components/course-card';
-import { type Course } from '@/lib/data';
+import type { Course, Testimonial } from '@/lib/data';
 import {
   Carousel,
   CarouselContent,
@@ -20,8 +20,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { HeroCarousel } from '@/components/hero-carousel';
 import { collection, getDocs, limit, query, orderBy } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
+import { unstable_noStore as noStore } from 'next/cache';
+import { seedTestimonials } from './admin/dashboard/testimonials/actions';
 
-const testimonials = [
+
+const placeholderTestimonials: Omit<Testimonial, 'id'>[] = [
     {
         quote: "The Web Development Bootcamp was incredible. I landed a new job before I even finished the course. The AI assistant helped me grasp complex concepts so much faster.",
         name: "Jessica Miller",
@@ -40,14 +43,30 @@ const testimonials = [
         title: "Data Science Enthusiast",
         avatar: "https://placehold.co/100x100.png"
     }
-]
+];
 
-export default async function Home() {
+async function getHomePageData() {
+  noStore(); // Ensures data is fetched on every request
+
+  // Fetch Courses
   const coursesCol = collection(firestore, 'courses');
-  const q = query(coursesCol, orderBy('createdAt', 'desc'), limit(6));
-  const coursesSnapshot = await getDocs(q);
+  const coursesQuery = query(coursesCol, orderBy('createdAt', 'desc'), limit(6));
+  const coursesSnapshot = await getDocs(coursesQuery);
   const featuredCourses: Course[] = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
 
+  // Fetch Testimonials
+  const testimonialsCol = collection(firestore, 'testimonials');
+  // Seed initial data if the collection is empty. This helps with first-run experience.
+  await seedTestimonials(placeholderTestimonials);
+  const testimonialsSnapshot = await getDocs(query(testimonialsCol));
+  const testimonials: Testimonial[] = testimonialsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
+
+  return { featuredCourses, testimonials };
+}
+
+
+export default async function Home() {
+  const { featuredCourses, testimonials } = await getHomePageData();
 
   return (
     <div className="flex flex-col min-h-[100dvh]">
@@ -114,7 +133,7 @@ export default async function Home() {
             <Carousel
                 opts={{
                 align: 'start',
-                loop: true,
+                loop: featuredCourses.length > 3,
                 }}
                 className="w-full max-w-6xl mx-auto"
             >
@@ -153,7 +172,7 @@ export default async function Home() {
             </div>
             <div className="mx-auto grid max-w-5xl items-stretch gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {testimonials.map((testimonial, index) => (
-                     <Card key={index} className="h-full flex flex-col animate-in fade-in slide-in-from-bottom-12 duration-500 ease-in-out" style={{ animationDelay: `${index * 150}ms`}}>
+                     <Card key={testimonial.id} className="h-full flex flex-col animate-in fade-in slide-in-from-bottom-12 duration-500 ease-in-out" style={{ animationDelay: `${index * 150}ms`}}>
                         <CardContent className="p-6 flex flex-col flex-grow">
                             <Quote className="h-8 w-8 text-primary mb-4" />
                             <p className="text-muted-foreground mb-6 flex-grow">{testimonial.quote}</p>

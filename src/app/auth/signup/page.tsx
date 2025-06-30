@@ -422,7 +422,7 @@ export default function SignupPage() {
               </Button>
                <Button variant="link" size="sm" onClick={() => setIsOtpSent(false)} disabled={phoneIsLoading} className="p-0 h-auto w-full text-xs">
                   Entered the wrong number?
-              </Button>
+               </Button>
             </div>
         )}
       </CardContent>

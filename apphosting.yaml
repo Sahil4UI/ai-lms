@@ -3,7 +3,7 @@
 
 # The ID of your App Hosting backend.
 # This is the ID you'll use to manage your backend, for example, when deploying.
-backendId: ai-lms-backend
+backendId: ai-lms-2100f
 
 # The Google Cloud project that the backend is hosted in.
 projectId: ai-lms-2100f

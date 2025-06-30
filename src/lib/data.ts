@@ -10,7 +10,7 @@ export type Lecture = {
 };
 
 export type Course = {
-  id: string; // Document ID from Firestore
+  id:string;
   title: string;
   description: string;
   instructorId: string; // UID of the trainer
@@ -24,4 +24,12 @@ export type Course = {
   whatYoullLearn: string[];
   lectures: Lecture[];
   createdAt: Timestamp;
+};
+
+export type Testimonial = {
+    id: string;
+    quote: string;
+    name: string;
+    title: string;
+    avatar: string;
 };
