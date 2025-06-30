@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
-import { LogIn, Menu, ToyBrick } from 'lucide-react';
+import { LogIn, Menu } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,7 +27,7 @@ const navLinks = [
 ];
 
 export function Header() {
-  const { user } = useAuth();
+  const { user, userData } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -89,6 +89,11 @@ export function Header() {
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard">Dashboard</Link>
                   </DropdownMenuItem>
+                  {userData?.role === 'trainer' && (
+                    <DropdownMenuItem asChild>
+                      <Link href="/trainers/dashboard">Trainer Dashboard</Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
                 </DropdownMenuContent>
@@ -159,6 +164,9 @@ export function Header() {
                                 </div>
                               </div>
                               <Link href="/dashboard" onClick={closeSheet}><Button className="w-full">Dashboard</Button></Link>
+                              {userData?.role === 'trainer' && (
+                                <Link href="/trainers/dashboard" onClick={closeSheet}><Button className="w-full" variant="outline">Trainer Dashboard</Button></Link>
+                              )}
                               <Button onClick={() => { handleLogout(); closeSheet(); }} variant="outline" className="w-full">Log out</Button>
                           </div>
                        ) : (

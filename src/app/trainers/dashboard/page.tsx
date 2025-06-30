@@ -1,9 +1,17 @@
+
 'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
-import { Loader2, Book, DollarSign, PlusCircle, Users } from 'lucide-react';
+import {
+  Loader2,
+  Book,
+  DollarSign,
+  PlusCircle,
+  Users,
+  MoreHorizontal,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -22,6 +30,14 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { courses } from '@/lib/data';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export default function TrainerDashboardPage() {
   const { user, loading } = useAuth();
@@ -112,7 +128,8 @@ export default function TrainerDashboardPage() {
                   <TableHead>Course</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Price</TableHead>
-                  <TableHead className="text-right">Students</TableHead>
+                  <TableHead>Students</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -123,8 +140,28 @@ export default function TrainerDashboardPage() {
                       <Badge>Published</Badge>
                     </TableCell>
                     <TableCell>${course.price}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell>
                       {course.students.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Course actions</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem>Edit Course Details</DropdownMenuItem>
+                          <DropdownMenuItem>Manage Content</DropdownMenuItem>
+                          <DropdownMenuItem>Create Quiz</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                            Delete Course
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}

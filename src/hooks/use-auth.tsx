@@ -1,11 +1,11 @@
+
 'use client';
 
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { Loader2 } from 'lucide-react';
-
+import { Preloader } from '@/components/preloader';
 import { auth, firestore } from '@/lib/firebase';
 
 interface AuthContextType {
@@ -40,7 +40,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
         setUserData(null);
       }
-      setLoading(false);
+      // Add a small delay to prevent flash of content
+      setTimeout(() => setLoading(false), 500);
     });
 
     return () => unsubscribe();
@@ -49,9 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return (
     <AuthContext.Provider value={{ user, userData, loading }}>
       {loading ? (
-        <div className="flex h-screen items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
+        <Preloader />
       ) : (
         children
       )}
