@@ -41,7 +41,7 @@ const testimonials = [
 ]
 
 export default function Home() {
-  const featuredCourses = courses.slice(0, 4);
+  const featuredCourses = courses.slice(0, 6);
 
   return (
     <div className="flex flex-col min-h-[100dvh]">

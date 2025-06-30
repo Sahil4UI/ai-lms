@@ -125,4 +125,56 @@ export const courses: Course[] = [
       { id: 'l5', title: 'Firebase Integration', duration: '01:40:00' },
     ],
   },
+  {
+    id: 'mysql-database',
+    title: 'The Ultimate MySQL Bootcamp: Go from SQL Beginner to Expert',
+    description:
+      'Master SQL, Database Management & Design. Includes Exercises, Challenges and a Certificate of Completion. A-Z Mastery!',
+    instructor: 'Colt Steele',
+    price: 79.99,
+    imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'database server',
+    category: 'Databases',
+    rating: 4.7,
+    students: 543210,
+    whatYoullLearn: [
+      'Create, read, update, and delete data from databases.',
+      'Write complex SQL queries across multiple tables.',
+      'Design and manage robust database schemas.',
+      'Work with string functions, aggregation, and logical operators.',
+    ],
+    lectures: [
+      { id: 'l1', title: 'Introduction to Databases and SQL', duration: '35:00' },
+      { id: 'l2', title: 'CRUD Operations', duration: '01:10:00' },
+      { id: 'l3', title: 'Advanced Selections & Joins', duration: '01:45:00' },
+      { id: 'l4', title: 'Database Design and Normalization', duration: '01:20:00' },
+      { id: 'l5', title: 'Triggers and Views', duration: '55:00' },
+    ],
+  },
+  {
+    id: 'data-science-python',
+    title: 'Python for Data Science and Machine Learning Bootcamp',
+    description:
+      'Learn how to use NumPy, Pandas, Seaborn, Matplotlib, Plotly, Scikit-Learn, Machine Learning, and more!',
+    instructor: 'Jose Portilla',
+    price: 89.99,
+    imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'data science chart',
+    category: 'Data Science',
+    rating: 4.8,
+    students: 1234567,
+    whatYoullLearn: [
+      'Use Python for Data Science and Machine Learning.',
+      'Implement Machine Learning Algorithms.',
+      'Learn to use Pandas for Data Analysis.',
+      'Create stunning data visualizations with Matplotlib and Seaborn.',
+    ],
+    lectures: [
+      { id: 'l1', title: 'Introduction to Data Science', duration: '25:00' },
+      { id: 'l2', title: 'NumPy Arrays', duration: '01:30:00' },
+      { id: 'l3', title: 'Pandas DataFrames', duration: '02:00:00' },
+      { id: 'l4', title: 'Data Visualization', duration: '01:45:00' },
+      { id: 'l5', title: 'Machine Learning Overview', duration: '02:10:00' },
+    ],
+  }
 ];
