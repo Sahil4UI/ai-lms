@@ -36,6 +36,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Check if Firebase was initialized correctly. The `auth` object might not have methods if keys are missing.
+    if (!auth?.onAuthStateChanged) {
+        console.warn("Firebase auth is not fully initialized. Skipping auth state changes.");
+        setTimeout(() => setLoading(false), 500);
+        return;
+    }
+
     const unsubscribeAuth = onAuthStateChanged(auth, (authUser) => {
       setUser(authUser);
       if (!authUser) {
