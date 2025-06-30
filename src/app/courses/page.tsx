@@ -4,6 +4,12 @@ import { type Course } from '@/lib/data';
 import { Search } from 'lucide-react';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Courses',
+  description: 'Explore our full catalog of expert-led courses. Find your next learning adventure in Web Development, Python, and more.',
+};
 
 export default async function CoursesPage() {
   const coursesCol = collection(firestore, 'courses');

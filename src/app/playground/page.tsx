@@ -9,6 +9,13 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Play } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Code Playground',
+  description: 'Experiment, practice, and perfect your coding skills in JavaScript, Python, and more, right here in your browser.',
+};
+
 
 export default function PlaygroundPage() {
   const placeholderCode = `// Welcome to the LearnAI Playground!

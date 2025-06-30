@@ -1,78 +1,78 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight } from 'lucide-react';
+import { DollarSign, UploadCloud, Users, BarChart } from 'lucide-react';
+import type { Metadata } from 'next';
 
-const openPositions = [
+export const metadata: Metadata = {
+  title: 'Become a Trainer',
+  description: 'Share your knowledge, help learners achieve their goals, and earn money. Join our community of expert instructors today.',
+};
+
+const features = [
     {
-        title: 'Python Instructor',
-        department: 'Instruction',
-        location: 'Remote',
-        description: 'Design and deliver world-class course content for Python, from beginner to advanced topics.'
+        icon: UploadCloud,
+        title: 'Effortless Course Creation',
+        description: 'Use our intuitive course builder to structure your curriculum, add lectures, and upload video content directly.'
     },
     {
-        title: 'Lead Web Development Instructor (React/Node.js)',
-        department: 'Instruction',
-        location: 'Remote',
-        description: 'Create and lead our flagship web development curriculum, mentoring students to become job-ready developers.'
+        icon: Users,
+        title: 'Reach a Global Audience',
+        description: 'Tap into our growing community of learners eager to acquire new skills. We handle the marketing, you focus on teaching.'
     },
     {
-        title: 'Microsoft Excel & VBA Expert',
-        department: 'Instruction',
-        location: 'Remote',
-        description: 'Develop engaging, practical learning materials for our popular Excel courses, covering advanced formulas, PivotTables, and VBA.'
+        icon: DollarSign,
+        title: 'Monetize Your Expertise',
+        description: 'Set your own prices and start earning. Our platform is built to help you turn your knowledge into a sustainable income stream.'
     },
-    {
-        title: 'Flutter & Dart Mobile Developer Instructor',
-        department: 'Instruction',
-        location: 'Remote',
-        description: 'Build and teach a comprehensive curriculum for building cross-platform mobile apps using Flutter and Dart.'
+     {
+        icon: BarChart,
+        title: 'Powerful Analytics',
+        description: 'Get insights into your course performance with our trainer dashboard. Track student enrollment and engagement.'
     }
 ]
 
-export default function CareersPage() {
+export default function TrainerPage() {
   return (
     <div className="bg-background">
-        <section className="w-full py-12 md:py-24 lg:py-32">
+        <section className="w-full py-20 md:py-28 lg:py-36 bg-gradient-to-b from-primary/10 to-transparent">
             <div className="container px-4 md:px-6">
-                <div className="mx-auto max-w-3xl text-center space-y-4 animate-in fade-in slide-in-from-bottom-8 duration-500">
-                    <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl">
-                    Join Our Mission
+                <div className="mx-auto max-w-3xl text-center space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                    <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl bg-gradient-to-br from-white via-slate-300 to-primary bg-clip-text text-transparent">
+                        Become a LearnAI Instructor
                     </h1>
                     <p className="text-lg text-muted-foreground">
-                    We're building the future of technical education, and we need passionate, talented people to help us achieve our vision.
+                        Share your knowledge, help learners achieve their goals, and earn money. Join our community of expert instructors today.
                     </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <Button asChild size="lg">
+                            <Link href="/auth/signup">
+                                Get Started
+                            </Link>
+                        </Button>
+                         <Button asChild size="lg" variant="outline">
+                            <Link href="/trainers/dashboard">
+                                Go to Your Dashboard
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section className="w-full pb-12 md:pb-24 lg:pb-32">
+        <section className="w-full py-12 md:py-24 lg:py-32">
             <div className="container px-4 md:px-6">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl mb-8 animate-in fade-in slide-in-from-bottom-8 duration-700">Open Positions</h2>
-                <div className="grid gap-6 animate-in fade-in slide-in-from-bottom-8 duration-900">
-                    {openPositions.map((position, index) => (
-                        <Card key={index} className="hover:bg-muted/40 transition-colors">
-                            <CardHeader className="grid items-start gap-4 space-y-0 md:grid-cols-3 md:space-x-4">
-                                <div className="md:col-span-2 space-y-1">
-                                    <CardTitle>{position.title}</CardTitle>
-                                    <CardDescription>{position.description}</CardDescription>
-                                </div>
-                                <div className="flex items-center space-x-1 rounded-md text-secondary-foreground md:justify-end">
-                                    <Button asChild variant="secondary" className="w-full md:w-auto">
-                                        <Link href="#">
-                                            Apply Now <ArrowRight className="ml-2 h-4 w-4" />
-                                        </Link>
-                                    </Button>
-                                </div>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="flex space-x-4 text-sm text-muted-foreground">
-                                    <div>{position.department}</div>
-                                    <div>&middot;</div>
-                                    <div>{position.location}</div>
-                                </div>
-                            </CardContent>
-                        </Card>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl text-center mb-12 animate-in fade-in slide-in-from-bottom-8 duration-700">Why Teach on LearnAI?</h2>
+                <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:grid-cols-2 lg:gap-16">
+                    {features.map((feature, index) => (
+                        <div key={index} className="flex gap-4 items-start animate-in fade-in slide-in-from-bottom-12 duration-500 ease-in-out" style={{ animationDelay: `${index * 150}ms`}}>
+                           <div className="bg-primary/10 text-primary p-3 rounded-lg">
+                             <feature.icon className="h-6 w-6" />
+                           </div>
+                            <div>
+                                <h3 className="text-lg font-bold">{feature.title}</h3>
+                                <p className="text-sm text-muted-foreground">{feature.description}</p>
+                            </div>
+                        </div>
                     ))}
                 </div>
             </div>

@@ -19,6 +19,17 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Loader2, PlusCircle, Trash2, Video } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Progress } from '@/components/ui/progress';
+import type { Metadata } from 'next';
+
+// export const metadata: Metadata = {
+//   title: 'Create Course',
+//   description: 'Build and launch your new course on LearnAI.',
+//   robots: {
+//     index: false,
+//     follow: false,
+//   }
+// };
+
 
 const lectureSchema = z.object({
   id: z.string(),

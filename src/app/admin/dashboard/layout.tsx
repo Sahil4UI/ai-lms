@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Book, LayoutDashboard, TestTube2, Users, TicketPercent } from 'lucide-react';
@@ -7,7 +5,10 @@ import { Book, LayoutDashboard, TestTube2, Users, TicketPercent } from 'lucide-r
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { logout } from '../actions';
-import { useEffect, useState } from 'react';
+
+// This is a server component now, but we need usePathname which is a client hook.
+// So we create a small client component to handle the navigation rendering.
+'use client';
 
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -17,27 +18,30 @@ const navItems = [
   { href: '/admin/dashboard/coupons', label: 'Coupons', icon: TicketPercent },
 ];
 
+function AdminNav() {
+  const pathname = usePathname();
+  return (
+    <>
+       {navItems.map(item => (
+        <Link key={item.href} href={item.href}>
+          <Button
+            variant={pathname === item.href ? 'default' : 'ghost'}
+            className="w-full justify-start gap-2"
+          >
+            <item.icon className="h-4 w-4" />
+            {item.label}
+          </Button>
+        </Link>
+      ))}
+    </>
+  )
+}
+
 export default function AdminDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    // This effect ensures we are on the client-side before rendering the full component.
-    // This avoids potential hydration mismatches with hooks like usePathname.
-    // The actual session protection is handled by the middleware.
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) {
-    // Render nothing or a loading spinner on the server and initial client render
-    // to prevent hydration mismatch.
-    return null;
-  }
-
   return (
     <div className="flex min-h-screen w-full">
       <aside className="hidden w-64 flex-col border-r bg-muted/40 p-4 md:flex">
@@ -47,17 +51,7 @@ export default function AdminDashboardLayout({
           </Link>
         </div>
         <nav className="flex flex-1 flex-col gap-2">
-          {navItems.map(item => (
-            <Link key={item.href} href={item.href}>
-              <Button
-                variant={pathname.startsWith(item.href) ? 'default' : 'ghost'}
-                className="w-full justify-start gap-2"
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </Button>
-            </Link>
-          ))}
+          <AdminNav />
         </nav>
         <div className="mt-auto">
           <form action={logout}>

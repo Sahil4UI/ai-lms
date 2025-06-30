@@ -183,7 +183,7 @@ export default function TrainerDashboardPage() {
                       <TableCell>
                         <Badge>Published</Badge>
                       </TableCell>
-                      <TableCell>${course.price}</TableCell>
+                      <TableCell>${course.price.toFixed(2)}</TableCell>
                       <TableCell>
                         {course.students.toLocaleString()}
                       </TableCell>

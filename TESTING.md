@@ -1,0 +1,54 @@
+# LearnAI Testing Strategy & Test Cases
+
+This document outlines the testing strategy for the LearnAI platform. It provides a set of manual test cases for critical user flows to ensure the application is production-ready.
+
+## Testing Strategy
+
+A comprehensive testing strategy involves multiple layers:
+
+1.  **Unit Tests:** These test individual functions or components in isolation. They are fast and great for ensuring that small pieces of logic work correctly (e.g., a utility function).
+2.  **Integration Tests:** These test how multiple parts of the application work together. For example, testing that a form correctly submits data to a server action and updates the database.
+3.  **End-to-End (E2E) Tests:** These simulate a full user journey from start to finish, interacting with the application just like a real user would. They are the most comprehensive but also the slowest to run.
+
+This document focuses on providing clear test cases for **Integration** and **E2E** flows, which are crucial for verifying the application's core functionality.
+
+---
+
+## Critical User Flow Test Cases
+
+### 1. User Authentication Flow
+
+| Test Case ID | Description                                                               | Steps                                                                                                                                      | Expected Result                                                                                               |
+| :----------- | :------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------ |
+| **AUTH-01**  | **Successful Student Signup (Email)**                                     | 1. Navigate to `/auth/signup`. <br/> 2. Fill in Full Name, Email, and Password. <br/> 3. Select 'Student' role. <br/> 4. Click "Create Account". | User is redirected to `/dashboard`. <br/> A new user document is created in Firestore with `role: 'student'`.      |
+| **AUTH-02**  | **Successful Trainer Signup (Email)**                                     | 1. Navigate to `/auth/signup`. <br/> 2. Fill in Full Name, Email, and Password. <br/> 3. Select 'Trainer' role. <br/> 4. Click "Create Account". | User is redirected to `/dashboard`. <br/> A new user document is created in Firestore with `role: 'trainer'`.     |
+| **AUTH-03**  | **Successful Login**                                                      | 1. Navigate to `/auth/login`. <br/> 2. Enter valid credentials for an existing user. <br/> 3. Click "Login".                                    | User is redirected to `/dashboard`.                                                                           |
+| **AUTH-04**  | **Failed Login (Invalid Password)**                                       | 1. Navigate to `/auth/login`. <br/> 2. Enter a valid email but an incorrect password. <br/> 3. Click "Login".                               | An error toast notification appears. User remains on the login page.                                          |
+| **AUTH-05**  | **Admin Login**                                                           | 1. Navigate to `/admin/login`. <br/> 2. Enter 'admin' for username and 'admin' for password. <br/> 3. Click "Sign In".                        | User is redirected to `/admin/dashboard`.                                                                     |
+
+### 2. Course Creation & Management Flow (Trainer)
+
+| Test Case ID | Description                                              | Steps                                                                                                                                                                                                                                          | Expected Result                                                                                                                                                                                            |
+| :----------- | :------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **COURSE-01**| **Create a New Course**                                  | 1. Log in as a Trainer. <br/> 2. Navigate to the Trainer Dashboard (`/trainers/dashboard`). <br/> 3. Click "Create Course". <br/> 4. Fill in all required fields (title, description, price, etc.). <br/> 5. Add at least two lectures with titles, durations, and upload a video for each. <br/> 6. Click "Create and Upload Course". | A success toast appears. <br/> Trainer is redirected to the Trainer Dashboard. <br/> A new course document is created in Firestore. <br/> The uploaded videos exist in Firebase Storage under the correct path. |
+| **COURSE-02**| **View Created Course on Dashboard**                     | 1. Log in as a Trainer. <br/> 2. Navigate to the Trainer Dashboard.                                                                                                                                                                            | The newly created course appears in the "My Courses" table with the correct student count (0) and price.                                                                                                 |
+
+### 3. Course Enrollment & Consumption Flow (Student)
+
+| Test Case ID | Description                                                                | Steps                                                                                                                                                                                                                                  | Expected Result                                                                                                                                                                                          |
+| :----------- | :------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ENROLL-01**| **Student Enrolls in a Course (No Coupon)**                                | 1. Log in as a Student. <br/> 2. Navigate to `/courses`. <br/> 3. Click on a course to view its detail page. <br/> 4. Click "Enroll Now".                                                                                              | A success toast appears. <br/> The page refreshes, and the student now sees an "You are enrolled" message. <br/> The user's `enrolledCourses` array in Firestore is updated. <br/> The course's `students` count is incremented. |
+| **ENROLL-02**| **Student Applies a Valid Coupon**                                         | 1. Log in as a Student. <br/> 2. Create a coupon in the Admin Dashboard (e.g., `SAVE20` for 20% off). <br/> 3. On the course detail page, enter `SAVE20` in the coupon field and click "Apply". <br/> 4. Click "Enroll Now".                   | A success toast shows the discount. <br/> The price updates on the page. <br/> After enrollment, the coupon's `usageCount` in Firestore is incremented.                                                   |
+| **ENROLL-03**| **Student Views Enrolled Course on Dashboard**                             | 1. Log in as a Student who has enrolled in a course. <br/> 2. Navigate to `/dashboard`.                                                                                                                                               | The enrolled course appears in the "Continue Learning" section.                                                                                                                                        |
+| **ENROLL-04**| **Student Accesses Locked & Unlocked Lectures**                            | 1. As a logged-out user, visit a course page. <br/> 2. As a logged-in but unenrolled user, visit a course page. <br/> 3. As an enrolled student, visit the course page.                                                                    | Unenrolled users can only view the first 3 lectures. The rest are locked. <br/> Enrolled students can expand and view all lectures and their content (video and notes).                                   |
+| **ENROLL-05**| **AI Assistant Responds Correctly**                                        | 1. As an enrolled student, go to a course page. <br/> 2. Ask the AI Assistant a question relevant to the course content. <br/> 3. Ask a follow-up question.                                                                            | The AI provides a relevant answer based on the course material. <br/> The AI understands the context of the follow-up question and provides a coherent response.                                          |
+
+### 4. Admin Coupon Management
+
+| Test Case ID | Description                               | Steps                                                                                                                    | Expected Result                                                                                           |
+| :----------- | :---------------------------------------- | :----------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------- |
+| **ADMIN-01** | **Admin Creates and Deletes a Coupon**    | 1. Log in as Admin. <br/> 2. Navigate to `/admin/dashboard/coupons`. <br/> 3. Click "Add Coupon" and fill in the form. <br/> 4. Verify the new coupon appears in the table. <br/> 5. Click the delete icon for that coupon and confirm. | The coupon is successfully created and then removed from the table. The underlying Firestore data is updated correctly. |
+
+---
+
+This testing plan ensures that all critical paths of your application are functioning as expected, providing a high degree of confidence for a production launch.

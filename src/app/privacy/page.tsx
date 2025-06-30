@@ -1,6 +1,11 @@
 'use client';
 
+import type { Metadata } from 'next';
 import { useState, useEffect } from 'react';
+
+// export const metadata: Metadata = {
+//   title: 'Privacy Policy',
+// };
 
 export default function PrivacyPolicyPage() {
   const [currentDate, setCurrentDate] = useState('');
