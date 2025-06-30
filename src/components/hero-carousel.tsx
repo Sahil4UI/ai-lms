@@ -66,14 +66,14 @@ export function HeroCarousel() {
                 className="w-full h-[60vh] lg:h-[80vh] object-cover"
                 priority={index === 0}
               />
-              <div className="container absolute inset-0 z-20 flex flex-col items-center justify-center text-center text-white space-y-4 px-4 md:px-6">
-                <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+              <div key={index} className="container absolute inset-0 z-20 flex flex-col items-center justify-center text-center text-white space-y-4 px-4 md:px-6">
+                <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none animate-in fade-in-0 slide-in-from-bottom-12 duration-700">
                   {slide.headline}
                 </h1>
-                <p className="max-w-[700px] text-lg md:text-xl">
+                <p className="max-w-[700px] text-lg md:text-xl animate-in fade-in-0 slide-in-from-bottom-10 duration-1000">
                   {slide.description}
                 </p>
-                <Button asChild size="lg" className="group mt-4">
+                <Button asChild size="lg" className="group mt-4 animate-in fade-in-0 slide-in-from-bottom-8 duration-1200">
                   <Link href={slide.buttonLink}>
                     {slide.buttonLabel}
                     <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />

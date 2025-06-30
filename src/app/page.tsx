@@ -53,33 +53,33 @@ export default function Home() {
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
             <div className="space-y-2">
-              <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">
+              <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
                 Next-Gen Features
               </div>
-              <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl">
+              <h2 className="font-headline text-3xl font-bold tracking-tighter sm:text-5xl animate-in fade-in slide-in-from-bottom-8 duration-700">
                 Smarter Learning, Powered by AI
               </h2>
-              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed animate-in fade-in slide-in-from-bottom-12 duration-900">
                 We leverage cutting-edge AI to create a learning experience that's tailored to you.
               </p>
             </div>
           </div>
           <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:grid-cols-3 lg:gap-16 mt-12">
-            <div className="grid gap-1 text-center">
+            <div className="grid gap-1 text-center animate-in fade-in slide-in-from-bottom-12 duration-500 ease-in-out">
               <Cpu className="h-10 w-10 mx-auto text-primary" />
               <h3 className="text-lg font-bold">AI Course Assistant</h3>
               <p className="text-sm text-muted-foreground">
                 Your personal AI tutor for every course. Get unstuck, clarify doubts, and explore topics deeper, 24/7.
               </p>
             </div>
-            <div className="grid gap-1 text-center">
+            <div className="grid gap-1 text-center animate-in fade-in slide-in-from-bottom-12 duration-700 ease-in-out">
               <Rocket className="h-10 w-10 mx-auto text-primary" />
               <h3 className="text-lg font-bold">AI-Powered Recommendations</h3>
               <p className="text-sm text-muted-foreground">
                 Our AI suggests courses based on your learning history and career goals, guiding you on your optimal learning path.
               </p>
             </div>
-            <div className="grid gap-1 text-center">
+            <div className="grid gap-1 text-center animate-in fade-in slide-in-from-bottom-12 duration-900 ease-in-out">
               <BookOpen className="h-10 w-10 mx-auto text-primary" />
               <h3 className="text-lg font-bold">Lifetime Course Access</h3>
               <p className="text-sm text-muted-foreground">
@@ -143,7 +143,7 @@ export default function Home() {
             </div>
             <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {testimonials.map((testimonial, index) => (
-                     <Card key={index} className="bg-muted/40 border-border/60">
+                     <Card key={index} className="bg-muted/40 border-border/60 animate-in fade-in slide-in-from-bottom-12 duration-500 ease-in-out" style={{ animationDelay: `${index * 150}ms`}}>
                         <CardContent className="p-6">
                             <Quote className="h-8 w-8 text-primary mb-4" />
                             <p className="text-muted-foreground mb-6">{testimonial.quote}</p>
@@ -165,7 +165,7 @@ export default function Home() {
       </section>
 
       <section className="w-full py-12 md:py-24 lg:py-32">
-        <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
+        <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6 animate-in fade-in duration-500">
           <div className="space-y-3">
             <h2 className="font-headline text-3xl font-bold tracking-tighter md:text-4xl/tight">
               Share Your Knowledge

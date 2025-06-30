@@ -46,13 +46,13 @@ export function ParticlesBackground() {
       },
       particles: {
         color: {
-          value: theme === 'dark' ? '#ffffff' : '#000000',
+          value: theme === 'dark' ? '#ffffff' : '#4f46e5',
         },
         links: {
-          color: theme === 'dark' ? '#ffffff' : '#000000',
+          color: theme === 'dark' ? '#ffffff' : '#4f46e5',
           distance: 150,
           enable: true,
-          opacity: 0.2,
+          opacity: 0.3,
           width: 1,
         },
         move: {
@@ -62,7 +62,7 @@ export function ParticlesBackground() {
             default: 'out',
           },
           random: false,
-          speed: 1,
+          speed: 1.5,
           straight: false,
         },
         number: {
@@ -70,10 +70,10 @@ export function ParticlesBackground() {
             enable: true,
             area: 800,
           },
-          value: 80,
+          value: 100,
         },
         opacity: {
-          value: 0.2,
+          value: 0.4,
         },
         shape: {
           type: 'circle',
