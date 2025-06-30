@@ -1,16 +1,18 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { askCourseAssistant } from '@/ai/flows/ai-assistant';
-import { Bot, Loader2, Send, User } from 'lucide-react';
+import { Bot, Loader2, Send, User, LogIn } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { Course } from '@/lib/data';
 import ReactMarkdown from 'react-markdown';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/use-auth';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -18,9 +20,37 @@ interface Message {
 }
 
 export default function AiAssistant({ course }: { course: Course }) {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  if (!user) {
+    return (
+      <Card className="sticky top-24">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Bot className="h-6 w-6 text-primary" />
+            <div>
+              <CardTitle>AI Course Assistant</CardTitle>
+              <CardDescription>Log in to ask questions!</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-4">
+            Unlock the power of our AI Assistant by logging in. Get instant answers to your course-related questions and accelerate your learning.
+          </p>
+          <Button asChild className="w-full">
+            <Link href="/auth/login">
+              <LogIn className="mr-2 h-4 w-4" />
+              Login to Get Started
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const courseContext = `Title: ${course.title}\nDescription: ${
     course.description
