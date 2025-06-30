@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -53,11 +54,6 @@ export function Header() {
                 {link.label}
               </Link>
             ))}
-             {user && (
-              <Link href="/playground" className="transition-colors hover:text-foreground/80 text-foreground/60 font-medium">
-                Playground
-              </Link>
-            )}
           </nav>
         </div>
 
@@ -92,9 +88,6 @@ export function Header() {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard">Dashboard</Link>
-                  </DropdownMenuItem>
-                   <DropdownMenuItem asChild>
-                    <Link href="/playground">Playground</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
@@ -141,11 +134,6 @@ export function Header() {
                           {link.label}
                         </Link>
                       ))}
-                      {user && (
-                        <Link href="/playground" onClick={closeSheet} className="text-lg font-medium transition-colors hover:text-primary">
-                          Playground
-                        </Link>
-                      )}
                     </nav>
                     <div className="mt-auto flex flex-col gap-2">
                       <DropdownMenuSeparator />

@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { courses } from '@/lib/data';
@@ -71,7 +72,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
                 alt={course.title}
                 width={600}
                 height={400}
-                data-ai-hint="online learning technology"
+                data-ai-hint={course.imageHint}
                 className="w-full object-cover rounded-lg border"
               />
           </div>

@@ -1,3 +1,4 @@
+
 export type Lecture = {
   id: string;
   title: string;
@@ -11,6 +12,7 @@ export type Course = {
   instructor: string;
   price: number;
   imageUrl: string;
+  imageHint: string;
   category: string;
   rating: number;
   students: number;
@@ -27,6 +29,7 @@ export const courses: Course[] = [
     instructor: 'Jose Portilla',
     price: 84.99,
     imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'python code',
     category: 'Programming',
     rating: 4.7,
     students: 1750231,
@@ -40,6 +43,8 @@ export const courses: Course[] = [
       { id: 'l1', title: 'Course Introduction', duration: '12:45' },
       { id: 'l2', title: 'Python Setup', duration: '20:00' },
       { id: 'l3', title: 'Python Object and Data Structure Basics', duration: '45:15' },
+      { id: 'l4', title: 'Advanced Python Modules', duration: '30:00' },
+      { id: 'l5', title: 'Web Scraping with Python', duration: '55:30' },
     ],
   },
   {
@@ -50,6 +55,7 @@ export const courses: Course[] = [
     instructor: 'Dr. Angela Yu',
     price: 84.99,
     imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'web development',
     category: 'Web Development',
     rating: 4.8,
     students: 987123,
@@ -63,6 +69,8 @@ export const courses: Course[] = [
       { id: 'l1', title: 'Front-End Web Development', duration: '01:15:00' },
       { id: 'l2', title: 'Introduction to HTML', duration: '01:05:30' },
       { id: 'l3', title: 'Intermediate CSS', duration: '01:45:00' },
+      { id: 'l4', title: 'Javascript for Beginners', duration: '02:30:00' },
+      { id: 'l5', title: 'The Document Object Model (DOM)', duration: '01:25:00' },
     ],
   },
   {
@@ -73,6 +81,7 @@ export const courses: Course[] = [
     instructor: 'Kyle Pew',
     price: 84.99,
     imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'excel spreadsheet',
     category: 'Business & Office',
     rating: 4.7,
     students: 1004567,
@@ -86,6 +95,8 @@ export const courses: Course[] = [
       { id: 'l1', title: 'Introduction to Excel', duration: '30:10' },
       { id: 'l2', title: 'Formulas and Functions', duration: '01:10:20' },
       { id: 'l3', title: 'Pivot Tables', duration: '50:00' },
+      { id: 'l4', title: 'Advanced Charting', duration: '45:00' },
+      { id: 'l5', title: 'Introduction to VBA', duration: '01:15:00' },
     ],
   },
   {
@@ -96,6 +107,7 @@ export const courses: Course[] = [
     instructor: 'Maximilian Schwarzmüller',
     price: 84.99,
     imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'mobile app',
     category: 'Mobile Development',
     rating: 4.6,
     students: 754321,
@@ -109,6 +121,8 @@ export const courses: Course[] = [
       { id: 'l1', title: 'Getting Started with Flutter', duration: '45:00' },
       { id: 'l2', title: 'Widgets, Styling & Layout', duration: '02:15:30' },
       { id: 'l3', title: 'State Management', duration: '01:50:00' },
+      { id: 'l4', title: 'Working with Device Features', duration: '01:35:00' },
+      { id: 'l5', title: 'Firebase Integration', duration: '01:40:00' },
     ],
   },
 ];
