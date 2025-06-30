@@ -6,7 +6,6 @@ import {
   Cpu,
   Quote,
   Rocket,
-  Star,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CourseCard } from '@/components/course-card';
@@ -20,25 +19,26 @@ import {
 } from '@/components/ui/carousel';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { HeroCarousel } from '@/components/hero-carousel';
 
 const testimonials = [
     {
         quote: "This platform transformed my understanding of machine learning. The AI assistant is a game-changer for getting unstuck on complex topics.",
         name: "Alex Johnson",
         title: "Data Science Student",
-        avatar: "https://placehold.co/40x40.png"
+        avatar: "https://placehold.co/100x100.png"
     },
     {
         quote: "As a full-stack developer, I've seen many platforms, but none with the polish and AI integration of LearnAI. The Next.js course was top-notch.",
         name: "Samantha Lee",
         title: "Software Engineer",
-        avatar: "https://placehold.co/40x40.png"
+        avatar: "https://placehold.co/100x100.png"
     },
     {
         quote: "I went from zero to building my own applications. The hands-on projects and instant feedback from the AI assistant made all the difference.",
         name: "Michael Chen",
         title: "Aspiring Developer",
-        avatar: "https://placehold.co/40x40.png"
+        avatar: "https://placehold.co/100x100.png"
     }
 ]
 
@@ -47,40 +47,8 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-[100dvh]">
-      <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
-        <div className="container px-4 md:px-6">
-          <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
-            <div className="flex flex-col justify-center space-y-4">
-              <div className="space-y-2">
-                <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
-                  The Future of Learning is Here.
-                </h1>
-                <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                  Supercharge your CS journey with an AI co-pilot for every course. Personalized, interactive, and always available.
-                </p>
-              </div>
-              <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                <Button asChild size="lg" className="group">
-                  <Link href="/courses">
-                    Explore Courses
-                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </Button>
-                <Button asChild variant="secondary" size="lg">
-                  <Link href="/trainers">Become a Trainer</Link>
-                </Button>
-              </div>
-            </div>
-            <Image
-              src="https://placehold.co/600x600.png"
-              width="600"
-              height="600"
-              alt="Hero"
-              data-ai-hint="futuristic education"
-              className="mx-auto aspect-square overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
-            />
-          </div>
-        </div>
+      <section className="w-full">
+         <HeroCarousel />
       </section>
 
       <section id="features" className="w-full py-12 md:py-24 lg:py-32">

@@ -63,7 +63,7 @@ export default function TrainersPage() {
               width={600}
               height={400}
               alt="Trainer"
-              data-ai-hint="teacher online"
+              data-ai-hint="teacher presenting online"
               className="mx-auto aspect-video overflow-hidden rounded-xl object-cover"
             />
           </div>

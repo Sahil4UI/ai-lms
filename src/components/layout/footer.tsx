@@ -1,24 +1,70 @@
 import Link from 'next/link';
 import { Icons } from '@/components/icons';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Facebook, Twitter, Linkedin, Github } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="w-full border-t bg-muted">
-      <div className="container py-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Icons.logo className="h-6 w-6 text-primary" />
-            <p className="text-center text-sm leading-loose md:text-left">
-              Built by{' '}
-              <a
-                href="#"
-                target="_blank"
-                rel="noreferrer"
-                className="font-medium underline underline-offset-4"
-              >
-                AI
-              </a>
-              . Powered by{' '}
+    <footer className="w-full border-t bg-muted/40">
+      <div className="container py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="flex flex-col gap-4">
+                 <Link href="/" className="flex items-center space-x-2">
+                    <Icons.logo className="h-7 w-7 text-primary" />
+                    <span className="text-xl font-bold font-headline">LearnAI</span>
+                </Link>
+                <p className="text-muted-foreground text-sm">
+                    The future of computer science education, powered by AI.
+                </p>
+                <div className="flex gap-2">
+                    <Button variant="ghost" size="icon" asChild>
+                        <Link href="#"><Twitter className="h-4 w-4" /></Link>
+                    </Button>
+                    <Button variant="ghost" size="icon" asChild>
+                        <Link href="#"><Facebook className="h-4 w-4" /></Link>
+                    </Button>
+                    <Button variant="ghost" size="icon" asChild>
+                        <Link href="#"><Linkedin className="h-4 w-4" /></Link>
+                    </Button>
+                     <Button variant="ghost" size="icon" asChild>
+                        <Link href="#"><Github className="h-4 w-4" /></Link>
+                    </Button>
+                </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+                <h4 className="font-semibold">Platform</h4>
+                <Link href="/courses" className="text-sm text-muted-foreground hover:text-primary">Courses</Link>
+                <Link href="/#features" className="text-sm text-muted-foreground hover:text-primary">Features</Link>
+                <Link href="/#testimonials" className="text-sm text-muted-foreground hover:text-primary">Testimonials</Link>
+                <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-primary">My Dashboard</Link>
+            </div>
+
+            <div className="flex flex-col gap-3">
+                <h4 className="font-semibold">Company</h4>
+                <Link href="/careers" className="text-sm text-muted-foreground hover:text-primary">Careers</Link>
+                <Link href="/trainers" className="text-sm text-muted-foreground hover:text-primary">For Trainers</Link>
+                <Link href="/contact" className="text-sm text-muted-foreground hover:text-primary">Contact Us</Link>
+                 <Link href="#" className="text-sm text-muted-foreground hover:text-primary">Blog</Link>
+            </div>
+
+            <div className="flex flex-col gap-4">
+                <h4 className="font-semibold">Stay Updated</h4>
+                <p className="text-sm text-muted-foreground">Subscribe to our newsletter to get the latest updates.</p>
+                <div className="flex w-full max-w-sm items-center space-x-2">
+                    <Input type="email" placeholder="Email" />
+                    <Button type="submit">Subscribe</Button>
+                </div>
+            </div>
+        </div>
+
+        <div className="mt-8 pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-2">
+           <p className="text-sm text-muted-foreground">
+              &copy; {new Date().getFullYear()} LearnAI, Inc. All rights reserved.
+            </p>
+             <p className="text-sm text-muted-foreground">
+              Powered by{' '}
               <a
                 href="https://firebase.google.com/docs/studio"
                 target="_blank"
@@ -29,21 +75,6 @@ export function Footer() {
               </a>
               .
             </p>
-          </div>
-          <div className="flex gap-4 text-sm text-muted-foreground">
-            <Link href="/#features" className="hover:text-primary">
-              Features
-            </Link>
-            <Link href="/courses" className="hover:text-primary">
-              Courses
-            </Link>
-            <Link href="/trainers" className="hover:text-primary">
-              Trainers
-            </Link>
-            <Link href="/careers" className="hover:text-primary">
-              Careers
-            </Link>
-          </div>
         </div>
       </div>
     </footer>

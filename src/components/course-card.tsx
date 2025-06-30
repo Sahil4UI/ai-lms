@@ -27,7 +27,7 @@ export function CourseCard({ course }: CourseCardProps) {
               alt={course.title}
               width={600}
               height={400}
-              data-ai-hint="online course"
+              data-ai-hint="online course abstract"
               className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
             />
           </div>

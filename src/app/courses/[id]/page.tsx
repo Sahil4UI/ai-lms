@@ -69,7 +69,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
                 alt={course.title}
                 width={600}
                 height={400}
-                data-ai-hint="online learning"
+                data-ai-hint="online learning technology"
                 className="w-full object-cover rounded-lg border"
               />
           </div>
