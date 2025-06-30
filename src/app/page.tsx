@@ -1,7 +1,5 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import {
-  ArrowRight,
   BookOpen,
   Cpu,
   Quote,
@@ -47,7 +45,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-[100dvh]">
-      <section className="w-full">
+      <section className="w-full relative">
          <HeroCarousel />
       </section>
 
