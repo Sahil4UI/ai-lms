@@ -30,7 +30,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
     <div className="bg-background">
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="grid md:grid-cols-3 gap-8">
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 animate-in fade-in slide-in-from-left-8 duration-700">
             <Badge className="mb-2">{course.category}</Badge>
             <h1 className="font-headline text-3xl md:text-4xl font-bold">
               {course.title}
@@ -63,7 +63,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
                 </Button>
             </div>
           </div>
-          <div className="hidden md:block">
+          <div className="hidden md:block animate-in fade-in slide-in-from-right-8 duration-700">
               <Image
                 src={course.imageUrl}
                 alt={course.title}
@@ -78,7 +78,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
 
       <div className="container mx-auto px-4 pb-12">
         <div className="grid md:grid-cols-3 gap-8 items-start">
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 animate-in fade-in slide-in-from-bottom-8 duration-900">
             <div className="border rounded-lg p-6 bg-muted/30">
               <h2 className="text-xl font-bold mb-4">What you'll learn</h2>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -114,7 +114,7 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
             </div>
           </div>
 
-          <div className="md:sticky top-24">
+          <div className="md:sticky top-24 animate-in fade-in slide-in-from-bottom-8 duration-1000">
             <AiAssistant course={course} />
           </div>
         </div>

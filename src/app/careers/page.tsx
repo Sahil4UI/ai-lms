@@ -29,7 +29,7 @@ export default function CareersPage() {
     <div className="bg-background">
         <section className="w-full py-12 md:py-24 lg:py-32">
             <div className="container px-4 md:px-6">
-                <div className="mx-auto max-w-3xl text-center space-y-4">
+                <div className="mx-auto max-w-3xl text-center space-y-4 animate-in fade-in slide-in-from-bottom-8 duration-500">
                     <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl">
                     Join Our Mission
                     </h1>
@@ -42,8 +42,8 @@ export default function CareersPage() {
 
         <section className="w-full pb-12 md:pb-24 lg:pb-32">
             <div className="container px-4 md:px-6">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl mb-8">Open Positions</h2>
-                <div className="grid gap-6">
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl mb-8 animate-in fade-in slide-in-from-bottom-8 duration-700">Open Positions</h2>
+                <div className="grid gap-6 animate-in fade-in slide-in-from-bottom-8 duration-900">
                     {openPositions.map((position, index) => (
                         <Card key={index} className="hover:bg-muted/40 transition-colors">
                             <CardHeader className="grid items-start gap-4 space-y-0 md:grid-cols-3 md:space-x-4">

@@ -10,7 +10,7 @@ export default function ContactPage() {
     <div className="bg-background">
       <section className="w-full py-12 md:py-24 lg:py-32">
         <div className="container px-4 md:px-6">
-          <div className="mx-auto max-w-3xl text-center space-y-4">
+          <div className="mx-auto max-w-3xl text-center space-y-4 animate-in fade-in slide-in-from-bottom-8 duration-500">
             <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl">
               Get in Touch
             </h1>
@@ -26,7 +26,7 @@ export default function ContactPage() {
       <section className="w-full pb-12 md:pb-24 lg:pb-32">
         <div className="container px-4 md:px-6">
           <div className="grid gap-12 lg:grid-cols-2">
-            <div>
+            <div className="animate-in fade-in slide-in-from-left-8 duration-700">
               <Card>
                 <CardHeader>
                   <CardTitle>Send us a Message</CardTitle>
@@ -66,7 +66,7 @@ export default function ContactPage() {
                 </CardContent>
               </Card>
             </div>
-            <div className="space-y-8">
+            <div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-700">
               <div className="space-y-4">
                 <h3 className="text-2xl font-bold">Contact Information</h3>
                 <div className="space-y-3 text-muted-foreground">
