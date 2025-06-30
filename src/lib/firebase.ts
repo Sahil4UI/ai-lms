@@ -1,8 +1,8 @@
-import { getApp, getApps, initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
-import { getAnalytics, isSupported } from 'firebase/analytics';
+import { getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app';
+import { getAuth, type Auth } from 'firebase/auth';
+import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getStorage, type FirebaseStorage } from 'firebase/storage';
+import { getAnalytics, isSupported, type Analytics } from 'firebase/analytics';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -14,12 +14,31 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
-const firestore = getFirestore(app);
-const storage = getStorage(app);
-const analytics = isSupported().then(yes => (yes ? getAnalytics(app) : null));
+let app: FirebaseApp;
+let auth: Auth;
+let firestore: Firestore;
+let storage: FirebaseStorage;
+let analytics: Promise<Analytics | null>;
+
+// Conditionally initialize Firebase only if the API key is provided
+if (firebaseConfig.apiKey) {
+  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  auth = getAuth(app);
+  firestore = getFirestore(app);
+  storage = getStorage(app);
+  analytics = isSupported().then(yes => (yes ? getAnalytics(app) : null));
+} else {
+    // This is a fallback for when the environment variables are not set.
+    // This will prevent the app from crashing, but Firebase features will not work.
+    console.warn("Firebase config is missing. Firebase features will be disabled. Please set up your .env file as instructed in README.md");
+
+    // Provide mock/dummy objects to avoid crashing the app on import
+    app = {} as FirebaseApp;
+    auth = {} as Auth;
+    firestore = {} as Firestore;
+    storage = {} as FirebaseStorage;
+    analytics = Promise.resolve(null);
+}
 
 
 export { app, auth, firestore, storage, analytics };
