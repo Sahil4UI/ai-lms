@@ -156,7 +156,7 @@ export const courses: Course[] = [
     title: 'Python for Data Science and Machine Learning Bootcamp',
     description:
       'Learn how to use NumPy, Pandas, Seaborn, Matplotlib, Plotly, Scikit-Learn, Machine Learning, and more!',
-    instructor: 'Jose Portilla',
+    instructor: 'Sahil',
     price: 89.99,
     imageUrl: 'https://placehold.co/600x400.png',
     imageHint: 'data science chart',
