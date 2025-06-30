@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { askCourseAssistant } from '@/ai/flows/ai-assistant';
-import { Bot, Loader2, Send, User, LogIn } from 'lucide-react';
+import { Bot, Loader2, Send, User, LogIn, Sparkles, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import type { Course } from '@/lib/data';
 import ReactMarkdown from 'react-markdown';
@@ -52,24 +52,30 @@ export default function AiAssistant({ course }: { course: Course }) {
     );
   }
 
-  const courseContext = `Title: ${course.title}\nDescription: ${
-    course.description
-  }\nLectures: ${course.lectures.map((l) => l.title).join(', ')}`;
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim()) return;
 
     const userMessage: Message = { role: 'user', content: input };
     setMessages((prev) => [...prev, userMessage]);
+    const currentMessages = [...messages, userMessage];
     setInput('');
     setIsLoading(true);
 
     try {
+      const lecturesContext = course.lectures.map(l => ({
+        title: l.title,
+        notes: l.notes || '',
+      }));
+      
       const result = await askCourseAssistant({
-        courseContext,
+        courseTitle: course.title,
+        courseDescription: course.description,
+        lectures: lecturesContext,
         question: input,
+        history: messages, // Pass the entire message history
       });
+
       const assistantMessage: Message = { role: 'assistant', content: result.answer };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
@@ -82,6 +88,10 @@ export default function AiAssistant({ course }: { course: Course }) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleClearChat = () => {
+    setMessages([]);
   };
 
   return (
@@ -100,8 +110,16 @@ export default function AiAssistant({ course }: { course: Course }) {
             <ScrollArea className="flex-1 mb-4 pr-4">
                 <div className="space-y-4">
                 {messages.length === 0 && (
-                    <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
-                        Your conversation will appear here.
+                    <div className="flex flex-col items-center justify-center h-full text-center text-sm text-muted-foreground p-4 bg-muted/40 rounded-lg">
+                        <Sparkles className="h-8 w-8 text-primary mb-2" />
+                        <p className="font-semibold">Welcome to your AI Assistant!</p>
+                        <p>I can answer questions, summarize lectures, and explain concepts based on the course material. I even remember our conversation!</p>
+                        <p className="mt-2 font-medium">Try asking:</p>
+                        <ul className="mt-1 list-none text-xs text-left">
+                            <li>"Summarize the main points of lecture 1."</li>
+                            <li>"What's the difference between `let` and `const`?"</li>
+                            <li>"Now, give me a code example for that."</li>
+                        </ul>
                     </div>
                 )}
                 {messages.map((message, index) => (
@@ -149,7 +167,7 @@ export default function AiAssistant({ course }: { course: Course }) {
                 )}
                 </div>
             </ScrollArea>
-            <form onSubmit={handleSubmit} className="flex gap-2">
+            <form onSubmit={handleSubmit} className="flex gap-2 items-end">
                 <Textarea
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -165,6 +183,9 @@ export default function AiAssistant({ course }: { course: Course }) {
                 />
                 <Button type="submit" disabled={isLoading || !input.trim()} size="icon">
                     <Send className="h-4 w-4" />
+                </Button>
+                <Button type="button" variant="ghost" size="icon" onClick={handleClearChat} disabled={isLoading || messages.length === 0} title="Clear chat">
+                    <Trash2 className="h-4 w-4" />
                 </Button>
             </form>
         </div>
