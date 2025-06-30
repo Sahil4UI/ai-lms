@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/hooks/use-auth';
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
   title: 'LearnAI - The Future of Computer Science Education',
@@ -41,6 +42,7 @@ export default function RootLayout({
           </div>
           <Toaster />
           <SpeedInsights />
+          <Analytics />
         </AuthProvider>
       </body>
     </html>
