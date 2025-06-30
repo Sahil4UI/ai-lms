@@ -7,6 +7,7 @@ import {
   CheckCircle,
   PlayCircle,
   Star,
+  Lock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +19,7 @@ import {
 } from '@/components/ui/accordion';
 import LectureSummary from './lecture-summary';
 import AiAssistant from './ai-assistant';
+import { cn } from '@/lib/utils';
 
 export default function CourseDetailPage({ params }: { params: { id: string } }) {
   const course = courses.find((c) => c.id === params.id);
@@ -94,22 +96,35 @@ export default function CourseDetailPage({ params }: { params: { id: string } })
             <div className="mt-8">
               <h2 className="text-xl font-bold mb-4">Course Content</h2>
               <Accordion type="single" collapsible className="w-full">
-                {course.lectures.map((lecture, index) => (
-                  <AccordionItem value={`item-${index}`} key={lecture.id}>
-                    <AccordionTrigger>
-                      <div className="flex items-center gap-3">
-                        <PlayCircle className="w-5 h-5 text-muted-foreground" />
-                        <span className="font-medium">{lecture.title}</span>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="pl-8">
-                        <div className="flex justify-between items-center">
+                {course.lectures.map((lecture, index) => {
+                  const isLocked = index >= 3;
+                  return (
+                    <AccordionItem value={`item-${index}`} key={lecture.id} disabled={isLocked}>
+                      <AccordionTrigger
+                        disabled={isLocked}
+                        className={cn(isLocked && 'cursor-not-allowed text-muted-foreground hover:no-underline')}
+                      >
+                        <div className="flex items-center gap-3">
+                          {isLocked ? <Lock className="w-5 h-5" /> : <PlayCircle className="w-5 h-5" />}
+                          <span className="font-medium text-left">{lecture.title}</span>
+                        </div>
+                         {isLocked && <Badge variant="secondary" className="ml-auto mr-4">Locked</Badge>}
+                      </AccordionTrigger>
+                      <AccordionContent className="pl-11 pr-2">
+                        {!isLocked ? (
+                          <div className="flex justify-between items-center">
                             <p className="text-muted-foreground">Duration: {lecture.duration}</p>
                             <LectureSummary lecture={lecture} />
-                        </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
+                          </div>
+                        ) : (
+                          <p className="text-muted-foreground">
+                            Enroll in the course to unlock this lecture and get lifetime access.
+                          </p>
+                        )}
+                      </AccordionContent>
+                    </AccordionItem>
+                  );
+                })}
               </Accordion>
             </div>
           </div>
