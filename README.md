@@ -40,7 +40,7 @@ This project was built in Firebase Studio.
     - **Database**: Firestore
     - **File Storage**: Firebase Storage (for video uploads)
 - **Generative AI**: [Google AI & Genkit](https://firebase.google.com/docs/genkit)
-- **Deployment**: Configured for [Vercel](https://vercel.com/) (recommended) and Firebase App Hosting.
+- **Deployment**: Configured for [Vercel](https://vercel.com/) and Firebase App Hosting.
 
 ---
 
@@ -93,29 +93,56 @@ Go to your **Firebase Console -> Firestore Database -> Rules**. These rules are 
 
 ```
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow public read for courses and testimonials
+
+    // --- PUBLIC COLLECTIONS ---
+    // These collections can be read by anyone, including unauthenticated users,
+    // which is necessary for the homepage and course catalog to display properly.
     match /courses/{courseId} {
-      allow read: if true;
+      allow get, list: if true;
+      // Write access is restricted to authenticated trainers.
       allow write: if request.auth != null && request.auth.token.role == 'trainer';
     }
+
     match /testimonials/{testimonialId} {
-      allow read: if true;
+      allow get, list: if true;
+      // Write access is restricted to authenticated admins.
       allow write: if request.auth != null && request.auth.token.role == 'admin';
     }
-    match /coupons/{couponId} {
-        allow read: if request.auth != null;
-        allow write: if request.auth != null && request.auth.token.role == 'admin';
-    }
 
-    // Users can only read/write their own data
+    // --- AUTHENTICATED ACCESS ---
+    // Users can only manage their own data.
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
-    
-    // Lock down other collections
-    match /{document=**} {
+
+    // Authenticated users can read coupons to apply them.
+    match /coupons/{couponId} {
+      allow read: if request.auth != null;
+      // Admins can manage all coupon data.
+      allow write: if request.auth != null && request.auth.token.role == 'admin';
+    }
+
+    // --- WRITE-ONLY / INTERNAL COLLECTIONS ---
+    // These collections should not be publicly readable.
+    match /contactSubmissions/{docId} {
+      allow read, update, delete: if false;
+      // Allow anyone to create a contact submission.
+      allow create: if true;
+    }
+
+    match /newsletterSignups/{docId} {
+      allow read, update, delete: if false;
+      // Allow anyone to sign up for the newsletter.
+      allow create: if true;
+    }
+
+    // --- BACKEND-ONLY COLLECTIONS ---
+    // This collection is managed by backend services (e.g., Cloud Functions).
+    // Client access should be disabled.
+    match /notifications/{docId} {
       allow read, write: if false;
     }
   }

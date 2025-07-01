@@ -2,59 +2,53 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // --- PUBLIC & SEMI-PUBLIC COLLECTIONS ---
-    
-    // Anyone can read courses. Only trainers can create/update them.
+
+    // --- PUBLIC COLLECTIONS ---
+    // These collections can be read by anyone, including unauthenticated users,
+    // which is necessary for the homepage and course catalog to display properly.
     match /courses/{courseId} {
-      allow read: if true;
-      allow create, update: if request.auth != null && request.auth.token.role == 'trainer';
-      // Deletes are usually restricted to admins in a real app
-      allow delete: if request.auth != null && request.auth.token.role == 'admin';
+      allow get, list: if true;
+      // Write access is restricted to authenticated trainers.
+      allow write: if request.auth != null && request.auth.token.role == 'trainer';
     }
-    
-    // Anyone can read testimonials. Only admins can manage them.
+
     match /testimonials/{testimonialId} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.token.role == 'admin';
-    }
-    
-    // Authenticated users can read coupon details. Only admins can manage them.
-    match /coupons/{couponId} {
-      allow read: if request.auth != null;
+      allow get, list: if true;
+      // Write access is restricted to authenticated admins.
       allow write: if request.auth != null && request.auth.token.role == 'admin';
     }
 
-    // --- USER-SPECIFIC DATA ---
-    
-    // Users can only read and write to their own user document.
+    // --- AUTHENTICATED ACCESS ---
+    // Users can only manage their own data.
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
-    
-    // --- INTERNAL/LOGGING COLLECTIONS ---
-    
-    // Allow any authenticated user to create contact submissions or newsletter signups.
-    // Reading/deleting should be done via the Admin SDK in a backend function.
-    match /contactSubmissions/{docId} {
-        allow create: if true;
-        allow read, update, delete: if false;
-    }
-    match /newsletterSignups/{docId} {
-        allow create: if true;
-        allow read, update, delete: if false;
-    }
-    
-    // Allow the system (specifically a trainer creating a course) to write a notification.
-    // Reading should be done by a backend service.
-    match /notifications/{docId} {
-        allow create: if request.auth != null;
-        allow read, update, delete: if false;
+
+    // Authenticated users can read coupons to apply them.
+    match /coupons/{couponId} {
+      allow read: if request.auth != null;
+      // Admins can manage all coupon data.
+      allow write: if request.auth != null && request.auth.token.role == 'admin';
     }
 
-    // Explicitly deny access to any other collections not defined above.
-    // This is a good security practice, though covered by the default match.
-    match /{document=**} {
+    // --- WRITE-ONLY / INTERNAL COLLECTIONS ---
+    // These collections should not be publicly readable.
+    match /contactSubmissions/{docId} {
+      allow read, update, delete: if false;
+      // Allow anyone to create a contact submission.
+      allow create: if true;
+    }
+
+    match /newsletterSignups/{docId} {
+      allow read, update, delete: if false;
+      // Allow anyone to sign up for the newsletter.
+      allow create: if true;
+    }
+
+    // --- BACKEND-ONLY COLLECTIONS ---
+    // This collection is managed by backend services (e.g., Cloud Functions).
+    // Client access should be disabled.
+    match /notifications/{docId} {
       allow read, write: if false;
     }
   }
