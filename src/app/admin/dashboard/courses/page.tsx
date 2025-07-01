@@ -17,23 +17,39 @@ import { Loader2, MoreHorizontal, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { deleteCourse } from './actions';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AdminCoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  const fetchCourses = async () => {
+    setLoading(true);
+    const coursesCol = collection(firestore, 'courses');
+    const q = query(coursesCol, orderBy('createdAt', 'desc'));
+    const coursesSnapshot = await getDocs(q);
+    const coursesData = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+    setCourses(coursesData);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      setLoading(true);
-      const coursesCol = collection(firestore, 'courses');
-      const q = query(coursesCol, orderBy('createdAt', 'desc'));
-      const coursesSnapshot = await getDocs(q);
-      const coursesData = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
-      setCourses(coursesData);
-      setLoading(false);
-    };
     fetchCourses();
   }, []);
+
+  const handleDelete = async (course: Course) => {
+    if (window.confirm(`Are you sure you want to delete "${course.title}"? This action cannot be undone.`)) {
+        const result = await deleteCourse(course);
+        if (result.success) {
+            toast({ title: 'Success!', description: result.message });
+            fetchCourses(); // Re-fetch the list
+        } else {
+            toast({ title: 'Error', description: result.error, variant: 'destructive' });
+        }
+    }
+  }
 
   return (
     <Card>
@@ -76,7 +92,7 @@ export default function AdminCoursesPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem className="text-destructive focus:text-destructive">
+                        <DropdownMenuItem onClick={() => handleDelete(course)} className="text-destructive focus:text-destructive">
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete Course
                         </DropdownMenuItem>

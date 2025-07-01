@@ -11,16 +11,15 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent } from '@/components/ui/card';
-import { onSnapshot, query, collection, orderBy } from 'firebase/firestore';
+import { onSnapshot, query, collection, orderBy, Timestamp } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
-import { Loader2, Trash2, Edit, PlusCircle, TicketPercent } from 'lucide-react';
+import { Loader2, Trash2, Edit, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,7 +34,7 @@ type Coupon = {
   discountPercentage: number;
   isActive: boolean;
   usageCount: number;
-  createdAt: { seconds: number; nanoseconds: number; };
+  createdAt: Timestamp;
 };
 
 function CouponForm({
@@ -159,6 +158,7 @@ export default function AdminCouponsPage() {
                   <TableHead>Discount</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Times Used</TableHead>
+                  <TableHead>Created At</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -173,6 +173,9 @@ export default function AdminCouponsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell>{coupon.usageCount}</TableCell>
+                    <TableCell>
+                        {coupon.createdAt ? new Date(coupon.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" onClick={() => handleEditClick(coupon)}>
                           <Edit className="h-4 w-4" />

@@ -21,7 +21,7 @@ interface UserData {
   displayName: string;
   email: string;
   photoURL?: string;
-  role: 'student' | 'trainer';
+  role?: 'student' | 'trainer';
   createdAt: Timestamp;
 }
 
@@ -32,12 +32,23 @@ export default function AdminUsersPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       setLoading(true);
-      const usersCol = collection(firestore, 'users');
-      const q = query(usersCol, orderBy('createdAt', 'desc'));
-      const usersSnapshot = await getDocs(q);
-      const usersData = usersSnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as UserData));
-      setUsers(usersData);
-      setLoading(false);
+      if (!firestore) {
+        setUsers([]);
+        setLoading(false);
+        console.error("Firestore not configured");
+        return;
+      }
+      try {
+        const usersCol = collection(firestore, 'users');
+        const q = query(usersCol, orderBy('createdAt', 'desc'));
+        const usersSnapshot = await getDocs(q);
+        const usersData = usersSnapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as UserData));
+        setUsers(usersData);
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchUsers();
   }, []);
@@ -69,18 +80,22 @@ export default function AdminUsersPage() {
                     <div className="flex items-center gap-3">
                       <Avatar>
                         <AvatarImage src={user.photoURL} alt={user.displayName} />
-                        <AvatarFallback>{user.displayName?.charAt(0) || user.email.charAt(0)}</AvatarFallback>
+                        <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{user.displayName}</p>
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                        <p className="font-medium">{user.displayName || 'N/A'}</p>
+                        <p className="text-sm text-muted-foreground">{user.email || 'No email provided'}</p>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={user.role === 'trainer' ? 'default' : 'secondary'}>
-                      {user.role}
-                    </Badge>
+                    {user.role ? (
+                        <Badge variant={user.role === 'trainer' ? 'default' : 'secondary'}>
+                          {user.role}
+                        </Badge>
+                    ) : (
+                        <Badge variant="outline">Pending</Badge>
+                    )}
                   </TableCell>
                   <TableCell>
                     {user.createdAt ? new Date(user.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}

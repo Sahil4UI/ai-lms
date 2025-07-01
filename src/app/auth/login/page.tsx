@@ -25,6 +25,7 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
   type ConfirmationResult,
+  type User,
 } from 'firebase/auth';
 import { auth, firestore } from '@/lib/firebase';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
@@ -76,7 +77,7 @@ export default function LoginPage() {
     if (!auth) return;
     try {
       await signInWithEmailAndPassword(auth, data.email, data.password);
-      router.push('/dashboard');
+      // The useAuth hook will handle redirection based on role
     } catch (error: any) {
       toast({
         title: 'Login Failed',
@@ -88,11 +89,13 @@ export default function LoginPage() {
     }
   };
 
-  const handleUserCreationInDb = async (user: any) => {
+  const handleUserCreationInDb = async (user: User) => {
     if (!firestore) return;
     const userRef = doc(firestore, 'users', user.uid);
     const userDoc = await getDoc(userRef);
     if (!userDoc.exists()) {
+      // For social/phone sign-ins, we DON'T set a role.
+      // The user will be forced to select one after this.
       await setDoc(userRef, {
         uid: user.uid,
         email: user.email,
@@ -100,7 +103,7 @@ export default function LoginPage() {
         photoURL: user.photoURL,
         phoneNumber: user.phoneNumber,
         createdAt: serverTimestamp(),
-        role: 'student', // Default role for social/phone signup
+        // role is intentionally omitted
       });
     }
   }
@@ -112,7 +115,7 @@ export default function LoginPage() {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       await handleUserCreationInDb(result.user);
-      router.push('/dashboard');
+      // The useAuth hook will handle redirection
     } catch (error: any) {
       toast({
         title: 'Google Login Failed',
@@ -162,7 +165,7 @@ export default function LoginPage() {
     try {
       const result = await confirmationResult.confirm(otp);
       await handleUserCreationInDb(result.user);
-      router.push('/dashboard');
+      // The useAuth hook will handle redirection
     } catch (error: any) {
       toast({
         title: 'OTP Verification Failed',

@@ -26,9 +26,10 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
   type ConfirmationResult,
+  type User,
 } from 'firebase/auth';
 import { auth, firestore } from '@/lib/firebase';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import {
   Form,
@@ -64,7 +65,6 @@ export default function SignupPage() {
 
   // Phone state
   const [fullName, setFullName] = useState('');
-  const [role, setRole] = useState<Role>('student');
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
@@ -93,19 +93,28 @@ export default function SignupPage() {
   }, [view]);
 
   const handleUserCreationInDb = async (
-    user: any,
-    additionalData: { fullName?: string; role: Role }
+    user: User,
+    additionalData: { fullName?: string; role?: Role }
   ) => {
+    if (!firestore) return;
     const userRef = doc(firestore, 'users', user.uid);
-    await setDoc(userRef, {
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName || additionalData.fullName,
-      photoURL: user.photoURL,
-      phoneNumber: user.phoneNumber,
-      createdAt: serverTimestamp(),
-      role: additionalData.role,
-    });
+    const userDoc = await getDoc(userRef);
+
+    if (!userDoc.exists()) {
+        const dataToSet: any = {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName || additionalData.fullName,
+            photoURL: user.photoURL,
+            phoneNumber: user.phoneNumber,
+            createdAt: serverTimestamp(),
+        };
+        // Only add the role if it's provided (i.e., for email signup)
+        if (additionalData.role) {
+            dataToSet.role = additionalData.role;
+        }
+        await setDoc(userRef, dataToSet);
+    }
   };
 
   const onEmailSubmit = async (data: SignupFormValues) => {
@@ -121,7 +130,7 @@ export default function SignupPage() {
         fullName: data.fullName,
         role: data.role,
       });
-      router.push('/dashboard');
+      // The useAuth hook will handle redirection based on role
     } catch (error: any) {
       toast({
         title: 'Signup Failed',
@@ -139,8 +148,9 @@ export default function SignupPage() {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      await handleUserCreationInDb(result.user, { role: 'student' });
-      router.push('/dashboard');
+      // Pass no role, forcing role selection
+      await handleUserCreationInDb(result.user, {}); 
+      // The useAuth hook will handle redirection to role selection
     } catch (error: any) {
       toast({
         title: 'Google Signup Failed',
@@ -154,10 +164,10 @@ export default function SignupPage() {
   };
 
   const handleSendOtp = async () => {
-    if (!fullName.trim() || !role) {
+    if (!fullName.trim()) {
       toast({
         title: 'Missing Information',
-        description: 'Please provide your full name and select a role.',
+        description: 'Please provide your full name.',
         variant: 'destructive',
       });
       return;
@@ -198,8 +208,9 @@ export default function SignupPage() {
     try {
       const result = await confirmationResult.confirm(otp);
       await updateProfile(result.user, { displayName: fullName });
-      await handleUserCreationInDb(result.user, { role });
-      router.push('/dashboard');
+      // Pass no role, forcing role selection
+      await handleUserCreationInDb(result.user, { fullName });
+      // The useAuth hook will handle redirection to role selection
     } catch (error: any) {
       toast({
         title: 'OTP Verification Failed',
@@ -368,24 +379,6 @@ export default function SignupPage() {
                   <Label htmlFor="fullNamePhone">Full Name</Label>
                   <Input id="fullNamePhone" placeholder="Ada Lovelace" value={fullName} onChange={(e) => setFullName(e.target.value)} disabled={phoneIsLoading} />
               </div>
-               <div className="space-y-2">
-                  <Label>I am joining as a...</Label>
-                   <RadioGroup
-                      onValueChange={(value) => setRole(value as Role)}
-                      defaultValue={role}
-                      className="flex space-x-4 pt-1"
-                      disabled={phoneIsLoading}
-                    >
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                          <RadioGroupItem value="student" id="role-student-phone" />
-                          <Label htmlFor="role-student-phone" className="font-normal">Student</Label>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-2 space-y-0">
-                          <RadioGroupItem value="trainer" id="role-trainer-phone" />
-                          <Label htmlFor="role-trainer-phone" className="font-normal">Trainer</Label>
-                      </FormItem>
-                    </RadioGroup>
-              </div>
               <div className="space-y-2">
                   <Label htmlFor="phone">Phone Number</Label>
                   <Input
@@ -397,7 +390,7 @@ export default function SignupPage() {
                   disabled={phoneIsLoading}
                   />
               </div>
-              <Button onClick={handleSendOtp} className="w-full" disabled={phoneIsLoading || !phone || !fullName || !role}>
+              <Button onClick={handleSendOtp} className="w-full" disabled={phoneIsLoading || !phone || !fullName}>
                   {phoneIsLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                   Send OTP
               </Button>
