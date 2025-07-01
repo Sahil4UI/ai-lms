@@ -69,16 +69,3 @@ export async function deleteTestimonial(id: string) {
     return { error: 'Failed to delete testimonial.' };
   }
 }
-
-// Seed initial data if collection is empty
-export async function seedTestimonials(testimonials: Omit<Testimonial, 'id'>[]) {
-  if (!firestore) return; // Add this guard
-  const testimonialsCol = collection(firestore, 'testimonials');
-  const snapshot = await getDocs(testimonialsCol);
-  if (snapshot.empty) {
-      for (const testimonial of testimonials) {
-          await addDoc(testimonialsCol, testimonial);
-      }
-      revalidatePath('/');
-  }
-}

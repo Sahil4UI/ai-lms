@@ -21,7 +21,6 @@ import { HeroCarousel } from '@/components/hero-carousel';
 import { collection, getDocs, limit, query, orderBy } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
 import { unstable_noStore as noStore } from 'next/cache';
-import { seedTestimonials } from './admin/dashboard/testimonials/actions';
 
 
 const placeholderTestimonials: Omit<Testimonial, 'id'>[] = [
@@ -48,30 +47,31 @@ const placeholderTestimonials: Omit<Testimonial, 'id'>[] = [
 async function getHomePageData() {
   noStore(); // Ensures data is fetched on every request
 
-  // If firestore is not initialized, return empty/placeholder data to prevent crash
   if (!firestore) {
     console.warn("Firestore is not initialized. Skipping data fetching for homepage.");
-    return { featuredCourses: [], testimonials: placeholderTestimonials };
+    return { featuredCourses: [], testimonials: placeholderTestimonials.map(t => ({...t, id: t.name})) };
   }
 
   try {
-    // Fetch Courses
-    const coursesCol = collection(firestore, 'courses');
-    const coursesQuery = query(coursesCol, orderBy('createdAt', 'desc'), limit(6));
-    const coursesSnapshot = await getDocs(coursesQuery);
-    const featuredCourses: Course[] = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+    const coursesPromise = getDocs(query(collection(firestore, 'courses'), orderBy('createdAt', 'desc'), limit(6)));
+    const testimonialsPromise = getDocs(query(collection(firestore, 'testimonials')));
 
-    // Fetch Testimonials
-    await seedTestimonials(placeholderTestimonials);
-    const testimonialsCol = collection(firestore, 'testimonials');
-    const testimonialsSnapshot = await getDocs(query(testimonialsCol));
-    const testimonials: Testimonial[] = testimonialsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
+    const [coursesSnapshot, testimonialsSnapshot] = await Promise.all([coursesPromise, testimonialsPromise]);
+    
+    const featuredCourses: Course[] = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+    
+    let testimonials: Testimonial[] = testimonialsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
+
+    // If no testimonials are in the database, use the placeholders.
+    if (testimonials.length === 0) {
+      testimonials = placeholderTestimonials.map(t => ({...t, id: t.name}));
+    }
 
     return { featuredCourses, testimonials };
   } catch (error) {
     console.error("Homepage data fetching error:", error);
     // In case of error (e.g., permissions), return placeholder data
-    return { featuredCourses: [], testimonials: placeholderTestimonials };
+    return { featuredCourses: [], testimonials: placeholderTestimonials.map(t => ({...t, id: t.name})) };
   }
 }
 
