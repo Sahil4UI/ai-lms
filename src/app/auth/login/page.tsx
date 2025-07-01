@@ -89,13 +89,14 @@ export default function LoginPage() {
     }
   };
 
+  // When a user signs in with a social provider or phone for the first time,
+  // we create their user document in Firestore but OMIT the 'role'.
+  // The useAuth hook will then detect the missing role and redirect them to the role selection page.
   const handleUserCreationInDb = async (user: User) => {
     if (!firestore) return;
     const userRef = doc(firestore, 'users', user.uid);
     const userDoc = await getDoc(userRef);
     if (!userDoc.exists()) {
-      // For social/phone sign-ins, we DON'T set a role.
-      // The user will be forced to select one after this.
       await setDoc(userRef, {
         uid: user.uid,
         email: user.email,
@@ -103,7 +104,7 @@ export default function LoginPage() {
         photoURL: user.photoURL,
         phoneNumber: user.phoneNumber,
         createdAt: serverTimestamp(),
-        // role is intentionally omitted
+        // role is intentionally omitted to trigger the role selection page
       });
     }
   }
@@ -115,7 +116,7 @@ export default function LoginPage() {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       await handleUserCreationInDb(result.user);
-      // The useAuth hook will handle redirection
+      // The useAuth hook will handle redirection to dashboard or role selection
     } catch (error: any) {
       toast({
         title: 'Google Login Failed',
@@ -165,7 +166,7 @@ export default function LoginPage() {
     try {
       const result = await confirmationResult.confirm(otp);
       await handleUserCreationInDb(result.user);
-      // The useAuth hook will handle redirection
+      // The useAuth hook will handle redirection to dashboard or role selection
     } catch (error: any) {
       toast({
         title: 'OTP Verification Failed',

@@ -52,17 +52,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (authUser) {
         const userDocRef = doc(firestore, 'users', authUser.uid);
         const unsubscribeSnapshot = onSnapshot(userDocRef, (doc) => {
-          const fetchedUserData = doc.exists() ? (doc.data() as UserData) : null;
+          const fetchedUserData = doc.exists() ? ({ ...doc.data(), uid: doc.id } as UserData) : null;
           setUserData(fetchedUserData);
           
+          // This is the core logic for the role selection flow.
+          // If a user document exists but has no role, they are a new social/phone signup.
           if (fetchedUserData && !fetchedUserData.role) {
-            // This is a new user (from Google/Phone) who needs to select a role.
+            // Redirect them to select a role, unless they are already there.
             if (pathname !== '/auth/select-role') {
               router.push('/auth/select-role');
             }
-          } else if (fetchedUserData && fetchedUserData.role) {
+          } else if (fetchedUserData?.role) {
             // User has a role, handle redirects away from auth pages
-            if (pathname.startsWith('/auth')) {
+            if (pathname.startsWith('/auth/login') || pathname.startsWith('/auth/signup') || pathname.startsWith('/auth/select-role')) {
                 if (fetchedUserData.role === 'trainer') {
                     router.push('/trainers/dashboard');
                 } else {

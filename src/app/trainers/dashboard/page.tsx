@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -124,7 +123,7 @@ export default function TrainerDashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              Total sales from all courses
+              Total sales from all your courses
             </p>
           </CardContent>
         </Card>
@@ -136,7 +135,7 @@ export default function TrainerDashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold">{revenueShare}%</div>
             <p className="text-xs text-muted-foreground">
-              Your estimated earnings: ${yourEarnings.toFixed(2)}
+              Est. earnings: ${yourEarnings.toFixed(2)}
             </p>
           </CardContent>
         </Card>

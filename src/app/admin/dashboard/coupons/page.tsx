@@ -70,7 +70,7 @@ function CouponForm({
       <div>
         <Label htmlFor="discountPercentage">Discount Percentage (%)</Label>
         <Input id="discountPercentage" name="discountPercentage" type="number" defaultValue={coupon?.discountPercentage} required />
-        {state?.error?.discountPercentage && <p className="text-sm text-destructive mt-1">{state.error.discountPercentage[0]}</p>}
+        {typeof state?.error !== 'string' && state?.error?.discountPercentage && <p className="text-sm text-destructive mt-1">{state.error.discountPercentage[0]}</p>}
       </div>
        <div className="flex items-center space-x-2">
         <Switch id="isActive" name="isActive" defaultChecked={coupon ? coupon.isActive : true} />
@@ -94,9 +94,12 @@ export default function AdminCouponsPage() {
       setLoading(false);
       return;
     }
-    const q = query(collection(firestore, 'coupons'), orderBy('createdAt', 'desc'));
+    // Removed orderBy to prevent query failures if index is not created
+    const q = query(collection(firestore, 'coupons'));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const couponsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Coupon));
+      // Sort manually on the client
+      couponsData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
       setCoupons(couponsData);
       setLoading(false);
     }, (error) => {

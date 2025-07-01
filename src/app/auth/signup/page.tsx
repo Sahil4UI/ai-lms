@@ -83,7 +83,7 @@ export default function SignupPage() {
   });
 
   useEffect(() => {
-    if (view === 'phone' && !recaptchaVerifierRef.current) {
+    if (view === 'phone' && auth && !recaptchaVerifierRef.current) {
       recaptchaVerifierRef.current = new RecaptchaVerifier(auth, 'recaptcha-container', {
         'size': 'invisible',
         'callback': (response: any) => {},
@@ -119,6 +119,7 @@ export default function SignupPage() {
 
   const onEmailSubmit = async (data: SignupFormValues) => {
     setIsLoading(true);
+    if (!auth) return;
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -145,6 +146,7 @@ export default function SignupPage() {
 
   const handleGoogleSignup = async () => {
     setIsLoading(true);
+    if (!auth) return;
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
@@ -164,6 +166,7 @@ export default function SignupPage() {
   };
 
   const handleSendOtp = async () => {
+    if (!auth) return;
     if (!fullName.trim()) {
       toast({
         title: 'Missing Information',

@@ -11,9 +11,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { collection, getDocs, query, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, query, Timestamp } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
-import { Loader2, Edit, Percent } from 'lucide-react';
+import { Loader2, Edit } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -86,28 +86,34 @@ export default function AdminUsersPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTrainer, setEditingTrainer] = useState<UserData | undefined>(undefined);
 
+  const fetchUsers = async () => {
+    setLoading(true);
+    if (!firestore) {
+      toast({ title: "Error", description: "Firestore not configured", variant: "destructive" });
+      setUsers([]);
+      setLoading(false);
+      return;
+    }
+    try {
+      const usersCol = collection(firestore, 'users');
+      // Removed orderBy to prevent query failures if index is not created
+      const q = query(usersCol);
+      const usersSnapshot = await getDocs(q);
+      const usersData = usersSnapshot.docs.map(doc => ({ ...doc.data(), uid: doc.id } as UserData));
+      
+      // Sort manually on the client
+      usersData.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+      setUsers(usersData);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+      toast({ title: "Error", description: "Could not fetch user data.", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      if (!firestore) {
-        toast({ title: "Error", description: "Firestore not configured", variant: "destructive" });
-        setUsers([]);
-        setLoading(false);
-        return;
-      }
-      try {
-        const usersCol = collection(firestore, 'users');
-        const q = query(usersCol, orderBy('createdAt', 'desc'));
-        const usersSnapshot = await getDocs(q);
-        const usersData = usersSnapshot.docs.map(doc => ({ ...doc.data(), uid: doc.id } as UserData));
-        setUsers(usersData);
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-        toast({ title: "Error", description: "Could not fetch user data.", variant: "destructive" });
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUsers();
   }, [toast]);
   
@@ -119,6 +125,7 @@ export default function AdminUsersPage() {
   const closeDialog = () => {
       setIsFormOpen(false);
       setEditingTrainer(undefined);
+      fetchUsers(); // Re-fetch users to show updated data
   }
 
   const filteredUsers = users.filter(user => {
@@ -163,7 +170,7 @@ export default function AdminUsersPage() {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar>
-                          <AvatarImage src={user.photoURL} alt={user.displayName} />
+                          <AvatarImage src={user.photoURL ?? undefined} alt={user.displayName} />
                           <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}</AvatarFallback>
                         </Avatar>
                         <div>

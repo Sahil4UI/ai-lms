@@ -29,6 +29,7 @@ export async function updateTrainerRevenueShare(userId: string, prevState: any, 
       revenueSharePercentage: validated.data.revenueShare,
     });
     revalidatePath('/admin/dashboard/users');
+    revalidatePath('/trainers/dashboard'); // Also revalidate trainer dashboard
     return { success: true, message: 'Revenue share updated successfully!' };
   } catch (error) {
     console.error(error);

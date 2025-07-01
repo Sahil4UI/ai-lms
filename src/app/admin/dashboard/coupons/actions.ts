@@ -11,7 +11,7 @@ const couponSchema = z.object({
   isActive: z.preprocess((val) => val === 'on', z.boolean()).default(true)
 });
 
-// Schema for adding a coupon, where the code is generated automatically.
+// Schema for adding a coupon, where the admin only provides the discount.
 const addCouponSchema = couponSchema.omit({ code: true });
 
 export async function addCoupon(prevState: any, formData: FormData) {
@@ -37,7 +37,7 @@ export async function addCoupon(prevState: any, formData: FormData) {
     });
     revalidatePath('/admin/dashboard/coupons');
     revalidatePath('/admin/dashboard');
-    return { success: true, message: 'Coupon added successfully!' };
+    return { success: true, message: `Coupon ${code} added successfully!` };
   } catch (error) {
     console.error(error);
     return { error: 'Failed to add coupon. Please try again.' };
