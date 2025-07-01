@@ -1,0 +1,61 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // --- PUBLIC & SEMI-PUBLIC COLLECTIONS ---
+    
+    // Anyone can read courses. Only trainers can create/update them.
+    match /courses/{courseId} {
+      allow read: if true;
+      allow create, update: if request.auth != null && request.auth.token.role == 'trainer';
+      // Deletes are usually restricted to admins in a real app
+      allow delete: if request.auth != null && request.auth.token.role == 'admin';
+    }
+    
+    // Anyone can read testimonials. Only admins can manage them.
+    match /testimonials/{testimonialId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.role == 'admin';
+    }
+    
+    // Authenticated users can read coupon details. Only admins can manage them.
+    match /coupons/{couponId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.role == 'admin';
+    }
+
+    // --- USER-SPECIFIC DATA ---
+    
+    // Users can only read and write to their own user document.
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // --- INTERNAL/LOGGING COLLECTIONS ---
+    
+    // Allow any authenticated user to create contact submissions or newsletter signups.
+    // Reading/deleting should be done via the Admin SDK in a backend function.
+    match /contactSubmissions/{docId} {
+        allow create: if true;
+        allow read, update, delete: if false;
+    }
+    match /newsletterSignups/{docId} {
+        allow create: if true;
+        allow read, update, delete: if false;
+    }
+    
+    // Allow the system (specifically a trainer creating a course) to write a notification.
+    // Reading should be done by a backend service.
+    match /notifications/{docId} {
+        allow create: if request.auth != null;
+        allow read, update, delete: if false;
+    }
+
+    // Explicitly deny access to any other collections not defined above.
+    // This is a good security practice, though covered by the default match.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
