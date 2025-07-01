@@ -33,60 +33,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
-    if (!auth) {
+    // This effect runs once on mount to set up all auth and data listeners.
+    if (!auth || !firestore) {
+      console.warn("Firebase not configured. AuthProvider cannot function.");
       setLoading(false);
-      setInitialLoad(false);
       return;
     }
-    
+
     const unsubscribeAuth = onAuthStateChanged(auth, (authUser) => {
       setUser(authUser);
-      if (!authUser) {
-          // If there is no user, we can stop loading.
+
+      if (authUser) {
+        // User is logged in, set up a listener for their data in Firestore.
+        const userDocRef = doc(firestore, 'users', authUser.uid);
+        const unsubscribeSnapshot = onSnapshot(userDocRef, (doc) => {
+          setUserData(doc.exists() ? (doc.data() as UserData) : null);
+          setLoading(false); // Stop loading only after we have auth AND user data.
+        }, (error) => {
+          console.error("Error fetching user data:", error);
           setUserData(null);
           setLoading(false);
-          if (initialLoad) setInitialLoad(false);
+        });
+
+        // Return a cleanup function for the Firestore listener.
+        return () => unsubscribeSnapshot();
+      } else {
+        // User is not logged in.
+        setUserData(null);
+        setLoading(false); // Stop loading.
       }
     });
-    
+
+    // Return the cleanup function for the auth listener.
     return () => unsubscribeAuth();
-  }, [initialLoad]);
+  }, []); // Empty dependency array means this runs only once on mount.
 
-  useEffect(() => {
-    if (!user) {
-        // This case is handled by the onAuthStateChanged listener.
-        return;
-    }
-
-    if (!firestore) {
-        setUserData(null);
-        setLoading(false);
-        if (initialLoad) setInitialLoad(false);
-        return;
-    }
-
-    setLoading(true);
-    const userDocRef = doc(firestore, 'users', user.uid);
-    const unsubscribeSnapshot = onSnapshot(userDocRef, (doc) => {
-        setUserData(doc.exists() ? (doc.data() as UserData) : null);
-        setLoading(false);
-        if (initialLoad) setInitialLoad(false);
-      }, (error) => {
-        console.error("Error fetching user data:", error);
-        setUserData(null);
-        setLoading(false);
-        if (initialLoad) setInitialLoad(false);
-      });
-
-    return () => unsubscribeSnapshot();
-  }, [user, initialLoad]);
 
   return (
     <AuthContext.Provider value={{ user, userData, loading }}>
-      {initialLoad ? <Preloader /> : children}
+      {loading ? <Preloader /> : children}
     </AuthContext.Provider>
   );
 };

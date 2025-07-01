@@ -17,10 +17,14 @@ import {
 } from '@/components/ui/carousel';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { HeroCarousel } from '@/components/hero-carousel';
 import { collection, getDocs, limit, query, orderBy } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
-import { unstable_noStore as noStore } from 'next/cache';
+import dynamic from 'next/dynamic';
+
+const HeroCarousel = dynamic(() => import('@/components/hero-carousel').then(m => m.HeroCarousel), {
+  ssr: false,
+  loading: () => <div className="w-full h-[60vh] lg:h-[80vh] bg-background" />
+});
 
 
 const placeholderTestimonials: Omit<Testimonial, 'id'>[] = [
@@ -45,8 +49,6 @@ const placeholderTestimonials: Omit<Testimonial, 'id'>[] = [
 ];
 
 async function getHomePageData() {
-  noStore(); // Ensures data is fetched on every request
-
   if (!firestore) {
     console.warn("Firestore is not initialized. Skipping data fetching for homepage.");
     return { featuredCourses: [], testimonials: placeholderTestimonials.map(t => ({...t, id: t.name})) };

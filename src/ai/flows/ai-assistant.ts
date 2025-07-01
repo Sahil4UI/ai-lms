@@ -7,8 +7,9 @@
  * - CourseAssistantOutput - The return type for the askCourseAssistant function.
  */
 
+import {defineFlow, AITool, defineTool} from 'genkit';
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const CourseAssistantInputSchema = z.object({
   courseTitle: z.string(),
@@ -36,11 +37,14 @@ export async function askCourseAssistant(input: CourseAssistantInput): Promise<C
   return courseAssistantFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'courseAssistantPrompt',
-  input: {schema: CourseAssistantInputSchema},
-  output: {schema: CourseAssistantOutputSchema},
-  prompt: `You are LearnAI Bot, a friendly and brilliant AI teaching assistant for an online course. Your goal is to help students learn by answering their questions.
+const courseAssistantFlow = defineFlow(
+  {
+    name: 'courseAssistantFlow',
+    inputSchema: CourseAssistantInputSchema,
+    outputSchema: CourseAssistantOutputSchema,
+  },
+  async input => {
+    const prompt = `You are LearnAI Bot, a friendly and brilliant AI teaching assistant for an online course. Your goal is to help students learn by answering their questions.
 
 - Base your answers *only* on the provided course context (title, description, and lecture notes).
 - If a question is outside the scope of the course material, politely state that you can only answer questions about this course.
@@ -50,45 +54,30 @@ const prompt = ai.definePrompt({
 - When you provide a code example, briefly explain what the code does.
 
 ## Course Context
-Course Title: {{{courseTitle}}}
-Course Description: {{{courseDescription}}}
+Course Title: ${input.courseTitle}
+Course Description: ${input.courseDescription}
 
 ---
 Available Course Lectures and Notes:
-{{#each lectures}}
-Lecture: {{this.title}}
-Notes:
-{{#if this.notes}}
-{{{this.notes}}}
-{{else}}
-No notes available for this lecture.
-{{/if}}
----
-{{/each}}
+${input.lectures.map(l => `Lecture: ${l.title}\nNotes:\n${l.notes || 'No notes available for this lecture.'}`).join('\n---\n')}
 
 ## Conversation History
-{{#if history}}
-  {{#each history}}
-**{{this.role}}**: {{{this.content}}}
-  {{/each}}
-{{else}}
-No previous conversation history.
-{{/if}}
+${(input.history || []).map(m => `**${m.role}**: ${m.content}`).join('\n')}
 
 ## Current Student Question
-"{{{question}}}"
+"${input.question}"
 
-## Your Answer (in Markdown)`,
-});
+## Your Answer (in Markdown)`;
 
-const courseAssistantFlow = ai.defineFlow(
-  {
-    name: 'courseAssistantFlow',
-    inputSchema: CourseAssistantInputSchema,
-    outputSchema: CourseAssistantOutputSchema,
-  },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+    const llmResponse = await ai.generate({
+      prompt: prompt,
+      model: 'googleai/gemini-pro',
+      output: {
+        format: 'json',
+        schema: CourseAssistantOutputSchema,
+      },
+    });
+    
+    return llmResponse.output()!;
   }
 );

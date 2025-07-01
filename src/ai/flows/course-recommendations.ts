@@ -9,8 +9,9 @@
  * - CourseRecommendationsOutput - The return type for the getCourseRecommendations function.
  */
 
+import {defineFlow} from 'genkit';
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const CourseRecommendationsInputSchema = z.object({
   learningHistory: z
@@ -33,26 +34,29 @@ export async function getCourseRecommendations(input: CourseRecommendationsInput
   return courseRecommendationsFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'courseRecommendationsPrompt',
-  input: {schema: CourseRecommendationsInputSchema},
-  output: {schema: CourseRecommendationsOutputSchema},
-  prompt: `You are an AI course recommendation engine. Based on the learning history and preferences of the student, you will recommend a list of courses that are relevant and interesting to the student.
-
-Learning History: {{{learningHistory}}}
-Preferences: {{{preferences}}}
-
-Recommended Courses:`,
-});
-
-const courseRecommendationsFlow = ai.defineFlow(
+const courseRecommendationsFlow = defineFlow(
   {
     name: 'courseRecommendationsFlow',
     inputSchema: CourseRecommendationsInputSchema,
     outputSchema: CourseRecommendationsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    const prompt = `You are an AI course recommendation engine. Based on the learning history and preferences of the student, you will recommend a list of courses that are relevant and interesting to the student.
+
+Learning History: ${input.learningHistory}
+Preferences: ${input.preferences}
+
+Recommended Courses:`;
+
+    const llmResponse = await ai.generate({
+      prompt,
+      model: 'googleai/gemini-pro',
+      output: {
+        format: 'json',
+        schema: CourseRecommendationsOutputSchema,
+      },
+    });
+
+    return llmResponse.output()!;
   }
 );

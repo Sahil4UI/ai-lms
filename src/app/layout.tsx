@@ -5,8 +5,6 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/hooks/use-auth';
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { Analytics } from '@vercel/analytics/react';
 
 const siteConfig = {
   name: 'LearnAI',
@@ -84,8 +82,6 @@ export default function RootLayout({
             <Footer />
           </div>
           <Toaster />
-          <SpeedInsights />
-          <Analytics />
         </AuthProvider>
       </body>
     </html>
