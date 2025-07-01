@@ -1,0 +1,14 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Public read for all course materials
+    match /courses/{courseId}/{allPaths=**} {
+      allow read: if true;
+    }
+    // Only allow authenticated trainers to upload to their course folders
+    match /courses/{courseId}/{lectureId}/{fileName} {
+       allow write: if request.auth != null && request.auth.token.role == 'trainer';
+    }
+  }
+}
