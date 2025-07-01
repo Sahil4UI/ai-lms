@@ -1,4 +1,4 @@
-// src/ai/flows/lecture-summaries.ts
+
 'use server';
 /**
  * @fileOverview Lecture Summarization AI agent.
@@ -8,7 +8,6 @@
  * - SummarizeLectureOutput - The return type for the summarizeLecture function.
  */
 
-import {defineFlow} from 'genkit';
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 
@@ -31,32 +30,26 @@ export async function summarizeLecture(input: SummarizeLectureInput): Promise<Su
   return summarizeLectureFlow(input);
 }
 
-const summarizeLectureFlow = defineFlow(
+const prompt = ai.definePrompt({
+  name: 'summarizeLecturePrompt',
+  input: { schema: SummarizeLectureInputSchema },
+  output: { schema: SummarizeLectureOutputSchema },
+  prompt: `You are an expert at summarizing lectures.
+
+You will use this information to create a summary of the lecture.
+
+Topic: {{{topic}}}
+Video: {{media url=lectureVideoDataUri}}`,
+});
+
+const summarizeLectureFlow = ai.defineFlow(
   {
     name: 'summarizeLectureFlow',
     inputSchema: SummarizeLectureInputSchema,
     outputSchema: SummarizeLectureOutputSchema,
   },
-  async input => {
-    const prompt = `You are an expert at summarizing lectures.
-
-You will use this information to create a summary of the lecture.
-
-Topic: ${input.topic}
-Video: [Media content of the lecture video]`;
-
-    const llmResponse = await ai.generate({
-      prompt: [
-        {text: prompt},
-        {media: {url: input.lectureVideoDataUri}}
-      ],
-      model: 'googleai/gemini-pro-vision',
-      output: {
-        format: 'json',
-        schema: SummarizeLectureOutputSchema,
-      },
-    });
-
-    return llmResponse.output()!;
+  async (input) => {
+    const { output } = await prompt.generate({input: input});
+    return output!;
   }
 );

@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI assistant for courses.
@@ -7,7 +8,6 @@
  * - CourseAssistantOutput - The return type for the askCourseAssistant function.
  */
 
-import {defineFlow, AITool, defineTool} from 'genkit';
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
 
@@ -22,7 +22,7 @@ const CourseAssistantInputSchema = z.object({
     .string()
     .describe('The current question from the student.'),
   history: z.array(z.object({
-    role: z.enum(['user', 'assistant']),
+    role: z.enum(['user', 'model', 'assistant']),
     content: z.string()
   })).optional().describe("The conversation history between the user and the assistant.")
 });
@@ -37,14 +37,12 @@ export async function askCourseAssistant(input: CourseAssistantInput): Promise<C
   return courseAssistantFlow(input);
 }
 
-const courseAssistantFlow = defineFlow(
+const prompt = ai.definePrompt(
   {
-    name: 'courseAssistantFlow',
-    inputSchema: CourseAssistantInputSchema,
-    outputSchema: CourseAssistantOutputSchema,
-  },
-  async input => {
-    const prompt = `You are LearnAI Bot, a friendly and brilliant AI teaching assistant for an online course. Your goal is to help students learn by answering their questions.
+    name: 'courseAssistantPrompt',
+    input: { schema: CourseAssistantInputSchema },
+    output: { schema: CourseAssistantOutputSchema },
+    system: `You are LearnAI Bot, a friendly and brilliant AI teaching assistant for an online course. Your goal is to help students learn by answering their questions.
 
 - Base your answers *only* on the provided course context (title, description, and lecture notes).
 - If a question is outside the scope of the course material, politely state that you can only answer questions about this course.
@@ -54,30 +52,43 @@ const courseAssistantFlow = defineFlow(
 - When you provide a code example, briefly explain what the code does.
 
 ## Course Context
-Course Title: ${input.courseTitle}
-Course Description: ${input.courseDescription}
+Course Title: {{{courseTitle}}}
+Course Description: {{{courseDescription}}}
 
 ---
 Available Course Lectures and Notes:
-${input.lectures.map(l => `Lecture: ${l.title}\nNotes:\n${l.notes || 'No notes available for this lecture.'}`).join('\n---\n')}
+{{#each lectures}}
+Lecture: {{{title}}}
+Notes:
+{{{notes}}}
+---
+{{/each}}`,
+  },
+);
 
-## Conversation History
-${(input.history || []).map(m => `**${m.role}**: ${m.content}`).join('\n')}
-
-## Current Student Question
-"${input.question}"
-
-## Your Answer (in Markdown)`;
+const courseAssistantFlow = ai.defineFlow(
+  {
+    name: 'courseAssistantFlow',
+    inputSchema: CourseAssistantInputSchema,
+    outputSchema: CourseAssistantOutputSchema,
+  },
+  async (input) => {
+    // Map the role 'assistant' from our app to 'model' for Genkit
+    const history = (input.history || []).map(msg => ({
+      role: msg.role === 'assistant' ? 'model' : msg.role,
+      content: [{text: msg.content}]
+    }));
 
     const llmResponse = await ai.generate({
-      prompt: prompt,
-      model: 'googleai/gemini-pro',
-      output: {
-        format: 'json',
-        schema: CourseAssistantOutputSchema,
-      },
+        prompt: input.question,
+        history: history,
+        model: 'googleai/gemini-1.5-flash-preview',
+        system: prompt.compile({input: input}),
+        output: {
+            schema: CourseAssistantOutputSchema
+        }
     });
-    
-    return llmResponse.output()!;
+
+    return llmResponse.output!;
   }
 );
