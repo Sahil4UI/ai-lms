@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -27,6 +28,10 @@ export default function AdminCoursesPage() {
 
   const fetchCourses = async () => {
     setLoading(true);
+    if (!firestore) {
+      setLoading(false);
+      return;
+    }
     const coursesCol = collection(firestore, 'courses');
     const q = query(coursesCol, orderBy('createdAt', 'desc'));
     const coursesSnapshot = await getDocs(q);
