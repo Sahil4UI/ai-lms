@@ -12,6 +12,7 @@ import {
   Users,
   MoreHorizontal,
   Banknote,
+  Percent,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -59,6 +60,7 @@ export default function TrainerDashboardPage() {
     if (user && userData?.role === 'trainer') {
       const fetchCoursesAndStats = async () => {
         setIsFetching(true);
+        if (!firestore) return;
         const coursesCol = collection(firestore, 'courses');
         const q = query(
           coursesCol,
@@ -70,9 +72,7 @@ export default function TrainerDashboardPage() {
           (doc) => ({ id: doc.id, ...doc.data() } as Course)
         );
         
-        // Calculate stats
         const totalStudents = fetchedCourses.reduce((sum, course) => sum + course.students, 0);
-        // Revenue calculation is a placeholder until a payment system is integrated
         const totalRevenue = fetchedCourses.reduce((sum, course) => sum + (course.students * course.price), 0);
 
         setCourses(fetchedCourses);
@@ -92,6 +92,9 @@ export default function TrainerDashboardPage() {
     );
   }
 
+  const revenueShare = userData.revenueSharePercentage !== undefined ? userData.revenueSharePercentage : 70; // Default to 70%
+  const yourEarnings = stats.totalRevenue * (revenueShare / 100);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6 animate-in fade-in slide-in-from-bottom-8 duration-500">
@@ -102,10 +105,6 @@ export default function TrainerDashboardPage() {
             <p className="text-muted-foreground">Welcome back, {userData.displayName}!</p>
         </div>
         <div className="flex items-center gap-2">
-            <Button variant="outline" disabled>
-                <Banknote className="mr-2 h-4 w-4" />
-                Manage Payouts
-            </Button>
             <Button asChild>
             <Link href="/trainers/courses/create">
                 <PlusCircle className="mr-2 h-4 w-4" />
@@ -115,16 +114,28 @@ export default function TrainerDashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium">Gross Revenue</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              Gross revenue from all courses
+              Total sales from all courses
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Your Revenue Share</CardTitle>
+            <Percent className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{revenueShare}%</div>
+            <p className="text-xs text-muted-foreground">
+              Your estimated earnings: ${yourEarnings.toFixed(2)}
             </p>
           </CardContent>
         </Card>

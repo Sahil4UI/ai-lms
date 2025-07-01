@@ -61,11 +61,12 @@ function CouponForm({
 
   return (
     <form action={formAction} className="space-y-4">
-      <div>
-        <Label htmlFor="code">Coupon Code</Label>
-        <Input id="code" name="code" defaultValue={coupon?.code} required className="uppercase" />
-         {state?.error?.code && <p className="text-sm text-destructive mt-1">{state.error.code[0]}</p>}
-      </div>
+      {coupon && (
+        <div>
+          <Label htmlFor="code">Coupon Code (read-only)</Label>
+          <Input id="code" name="code" defaultValue={coupon?.code} readOnly className="uppercase" />
+        </div>
+      )}
       <div>
         <Label htmlFor="discountPercentage">Discount Percentage (%)</Label>
         <Input id="discountPercentage" name="discountPercentage" type="number" defaultValue={coupon?.discountPercentage} required />
@@ -88,14 +89,23 @@ export default function AdminCouponsPage() {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (!firestore) {
+      toast({ title: "Error", description: "Firestore not configured.", variant: "destructive" });
+      setLoading(false);
+      return;
+    }
     const q = query(collection(firestore, 'coupons'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const couponsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Coupon));
       setCoupons(couponsData);
       setLoading(false);
+    }, (error) => {
+        console.error("Error fetching coupons: ", error);
+        toast({ title: "Error", description: "Could not fetch coupons.", variant: "destructive" });
+        setLoading(false);
     });
     return () => unsubscribe();
-  }, []);
+  }, [toast]);
 
   const handleDelete = async (id: string) => {
     if(window.confirm('Are you sure you want to delete this coupon?')) {

@@ -4,18 +4,19 @@ import { usePathname, useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, type User } from 'firebase/auth';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, Timestamp } from 'firebase/firestore';
 import { Preloader } from '@/components/preloader';
 import { auth, firestore } from '@/lib/firebase';
 
-interface UserData {
+export interface UserData {
   uid: string;
   displayName: string;
   email: string;
   photoURL?: string;
   role?: 'student' | 'trainer';
   enrolledCourses?: string[];
-  // any other fields from your user document
+  revenueSharePercentage?: number;
+  createdAt: Timestamp;
 }
 
 interface AuthContextType {

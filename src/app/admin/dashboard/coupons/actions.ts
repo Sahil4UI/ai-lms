@@ -11,20 +11,27 @@ const couponSchema = z.object({
   isActive: z.preprocess((val) => val === 'on', z.boolean()).default(true)
 });
 
+// Schema for adding a coupon, where the code is generated automatically.
+const addCouponSchema = couponSchema.omit({ code: true });
+
 export async function addCoupon(prevState: any, formData: FormData) {
   if (!firestore) return { error: 'Firebase is not configured.' };
   
   const data = Object.fromEntries(formData.entries());
   
-  const validated = couponSchema.safeParse(data);
+  const validated = addCouponSchema.safeParse(data);
 
   if (!validated.success) {
     return { error: validated.error.flatten().fieldErrors };
   }
 
   try {
+    // Generate a unique, random 6-character alphanumeric code.
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+
     await addDoc(collection(firestore, 'coupons'), {
       ...validated.data,
+      code: code, // Add the generated code
       usageCount: 0,
       createdAt: serverTimestamp(),
     });
@@ -33,7 +40,7 @@ export async function addCoupon(prevState: any, formData: FormData) {
     return { success: true, message: 'Coupon added successfully!' };
   } catch (error) {
     console.error(error);
-    return { error: 'Failed to add coupon. The code may already exist.' };
+    return { error: 'Failed to add coupon. Please try again.' };
   }
 }
 
@@ -49,7 +56,9 @@ export async function updateCoupon(id: string, prevState: any, formData: FormDat
   
   try {
     const docRef = doc(firestore, 'coupons', id);
-    await updateDoc(docRef, validated.data);
+    // Don't allow changing the code on update
+    const { code, ...updateData } = validated.data;
+    await updateDoc(docRef, updateData);
     revalidatePath('/admin/dashboard/coupons');
     return { success: true, message: 'Coupon updated successfully!' };
   } catch (error) {
