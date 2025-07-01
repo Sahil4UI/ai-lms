@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, type User, Unsubscribe } from 'firebase/auth';
+import { onAuthStateChanged, type User } from 'firebase/auth';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { Preloader } from '@/components/preloader';
 import { auth, firestore } from '@/lib/firebase';
@@ -32,56 +32,61 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true); // Always start loading
+  const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
     if (!auth) {
       setLoading(false);
+      setInitialLoad(false);
       return;
     }
     
     const unsubscribeAuth = onAuthStateChanged(auth, (authUser) => {
       setUser(authUser);
-      // If there is no user, we can stop loading.
       if (!authUser) {
+          // If there is no user, we can stop loading.
           setUserData(null);
           setLoading(false);
+          if (initialLoad) setInitialLoad(false);
       }
     });
     
     return () => unsubscribeAuth();
-  }, []);
+  }, [initialLoad]);
 
   useEffect(() => {
     if (!user) {
-        // This case is handled by the onAuthStateChanged listener, which will set loading to false.
+        // This case is handled by the onAuthStateChanged listener.
         return;
     }
 
     if (!firestore) {
         setUserData(null);
         setLoading(false);
+        if (initialLoad) setInitialLoad(false);
         return;
     }
 
-    // When we have a user, but haven't fetched their data yet, we are loading.
     setLoading(true);
     const userDocRef = doc(firestore, 'users', user.uid);
     const unsubscribeSnapshot = onSnapshot(userDocRef, (doc) => {
         setUserData(doc.exists() ? (doc.data() as UserData) : null);
-        setLoading(false); // Stop loading once user data is fetched
+        setLoading(false);
+        if (initialLoad) setInitialLoad(false);
       }, (error) => {
         console.error("Error fetching user data:", error);
         setUserData(null);
-        setLoading(false); // Also stop loading on error
+        setLoading(false);
+        if (initialLoad) setInitialLoad(false);
       });
 
     return () => unsubscribeSnapshot();
-  }, [user]);
+  }, [user, initialLoad]);
 
   return (
     <AuthContext.Provider value={{ user, userData, loading }}>
-      {loading ? <Preloader /> : children}
+      {initialLoad ? <Preloader /> : children}
     </AuthContext.Provider>
   );
 };

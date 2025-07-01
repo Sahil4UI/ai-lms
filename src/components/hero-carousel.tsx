@@ -12,7 +12,11 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
-import { ParticlesBackground } from './particles-background';
+import dynamic from 'next/dynamic';
+
+const ParticlesBackground = dynamic(() => import('./particles-background').then(mod => mod.ParticlesBackground), {
+  ssr: false,
+});
 
 const heroSlides = [
   {

@@ -2,7 +2,6 @@
 
 import { CourseCard } from '@/components/course-card';
 import { type Course } from '@/lib/data';
-import Recommendations from './recommendations';
 import { collection, getDocs, limit, query, where, documentId } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
@@ -18,6 +17,18 @@ import {
 } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+
+
+const Recommendations = dynamic(() => import('./recommendations'), {
+  loading: () => (
+    <div className="flex justify-center items-center h-48">
+      <Loader2 className="h-8 w-8 animate-spin" />
+    </div>
+  ),
+  ssr: false, 
+});
+
 
 export default function DashboardPage() {
   const { userData, loading: authLoading } = useAuth();
@@ -27,6 +38,10 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchEnrolledCourses = async () => {
       if (userData?.enrolledCourses && userData.enrolledCourses.length > 0) {
+        if (!firestore) {
+          setLoading(false);
+          return;
+        }
         const coursesRef = collection(firestore, 'courses');
         const q = query(coursesRef, where(documentId(), 'in', userData.enrolledCourses));
         const coursesSnapshot = await getDocs(q);

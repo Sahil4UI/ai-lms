@@ -25,7 +25,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import AiAssistant from './ai-assistant';
 import { cn } from '@/lib/utils';
 import { doc, getDoc } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
@@ -37,6 +36,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { applyCoupon, enrollInCourse } from './actions';
 import type { Metadata } from 'next';
+import dynamic from 'next/dynamic';
+
+const AiAssistant = dynamic(() => import('./ai-assistant'), {
+  ssr: false,
+});
+
 
 // This function generates dynamic metadata for each course page
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {

@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -77,9 +78,6 @@ export function Footer() {
                     </Button>
                     <Button variant="ghost" size="icon" asChild>
                         <Link href="#"><Linkedin className="h-4 w-4" /></Link>
-                    </Button>
-                     <Button variant="ghost" size="icon" asChild>
-                        <Link href="#"><Github className="h-4 w-4" /></Link>
                     </Button>
                 </div>
             </div>
