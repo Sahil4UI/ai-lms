@@ -8,6 +8,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { CourseCard } from '@/components/course-card';
 import type { Course, Testimonial } from '@/lib/data';
+import { placeholderCourses } from '@/lib/placeholder-data';
 import {
   Carousel,
   CarouselContent,
@@ -49,9 +50,14 @@ const placeholderTestimonials: Omit<Testimonial, 'id'>[] = [
 ];
 
 async function getHomePageData() {
+  let featuredCourses: Course[] = [];
+  let testimonials: Testimonial[] = [];
+
   if (!firestore) {
-    console.warn("Firestore is not initialized. Skipping data fetching for homepage.");
-    return { featuredCourses: [], testimonials: placeholderTestimonials.map(t => ({...t, id: t.name})) };
+    console.warn("Firestore is not initialized. Using placeholder data for homepage.");
+    featuredCourses = placeholderCourses.slice(0, 6);
+    testimonials = placeholderTestimonials.map(t => ({...t, id: t.name}));
+    return { featuredCourses, testimonials };
   }
 
   try {
@@ -60,11 +66,13 @@ async function getHomePageData() {
 
     const [coursesSnapshot, testimonialsSnapshot] = await Promise.all([coursesPromise, testimonialsPromise]);
     
-    const featuredCourses: Course[] = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
-    
-    let testimonials: Testimonial[] = testimonialsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
+    featuredCourses = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
+    testimonials = testimonialsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
 
-    // If no testimonials are in the database, use the placeholders.
+    // If no courses or testimonials are in the database, use the placeholders.
+    if (featuredCourses.length === 0) {
+      featuredCourses = placeholderCourses.slice(0, 6);
+    }
     if (testimonials.length === 0) {
       testimonials = placeholderTestimonials.map(t => ({...t, id: t.name}));
     }
@@ -73,7 +81,9 @@ async function getHomePageData() {
   } catch (error) {
     console.error("Homepage data fetching error:", error);
     // In case of error (e.g., permissions), return placeholder data
-    return { featuredCourses: [], testimonials: placeholderTestimonials.map(t => ({...t, id: t.name})) };
+    featuredCourses = placeholderCourses.slice(0, 6);
+    testimonials = placeholderTestimonials.map(t => ({...t, id: t.name}));
+    return { featuredCourses, testimonials };
   }
 }
 
@@ -163,7 +173,7 @@ export default async function Home() {
                 <CarouselNext className="hidden sm:flex" />
             </Carousel>
           ) : (
-            <p className="text-center text-muted-foreground">No courses available yet. Check back soon!</p>
+            <p className="text-center text-muted-foreground">Creating amazing courses... Check back soon!</p>
           )}
           <div className="mt-12 flex justify-center">
             <Button asChild size="lg">

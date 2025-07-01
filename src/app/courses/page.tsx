@@ -1,6 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { CourseCard } from '@/components/course-card';
 import { type Course } from '@/lib/data';
+import { placeholderCourses } from '@/lib/placeholder-data';
 import { Search } from 'lucide-react';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
@@ -23,12 +24,16 @@ export default async function CoursesPage() {
       courses = coursesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Course));
     } catch (e) {
       console.error("Failed to fetch courses:", e);
-      error = "Could not load courses at this time.";
+      error = "Could not load courses at this time. Displaying placeholder content.";
     }
   } else {
-    error = "Firebase is not configured. Courses cannot be displayed.";
+    error = "Firebase is not configured. Displaying placeholder content.";
   }
   
+  // If there's an error or no courses, use the placeholder data.
+  if (courses.length === 0) {
+    courses = placeholderCourses;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -47,17 +52,13 @@ export default async function CoursesPage() {
           <Input placeholder="Search for courses..." className="pl-10" />
         </div>
       </div>
-      {error ? (
-        <p className="text-center text-destructive mt-12">{error}</p>
-      ) : courses.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 animate-in fade-in slide-in-from-bottom-8 duration-900">
-          {courses.map((course) => (
-            <CourseCard key={course.id} course={course} />
-          ))}
-        </div>
-      ) : (
-        <p className="text-center text-muted-foreground mt-12">No courses have been created yet. Be the first to create one!</p>
-      )}
+      {error && <p className="text-center text-yellow-500 mb-4">{error}</p>}
+      
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 animate-in fade-in slide-in-from-bottom-8 duration-900">
+        {courses.map((course) => (
+          <CourseCard key={course.id} course={course} />
+        ))}
+      </div>
     </div>
   );
 }
